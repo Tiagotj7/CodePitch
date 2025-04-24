@@ -4,369 +4,286 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <title>Login & Registration</title>
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
-        }
 
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: #0F0F0F;
-        }
+    <link rel="apple-touch-icon" sizes="180x180" href="src/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="src/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="src/favicon-16x16.png">
+    <link rel="manifest" href="src/site.webmanifest">
+    <link rel="mask-icon" href="src/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="shortcut icon" href="src/favicon.ico">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
 
-        .container {
-            position: relative;
-            width: 800px;
-            height: 500px;
-            background: #1F1F2E;
-            border-radius: 20px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
+    <link rel="stylesheet" href="style.css">
 
-        .forms-container {
-            position: absolute;
-            width: 200%;
-            height: 100%;
-            display: flex;
-            transition: transform 0.6s ease-in-out;
-        }
+    <title>CodePitch</title>
 
-        .form-section {
-            width: 50%;
-            height: 100%;
-            display: flex;
-        }
-
-        .form-box {
-            width: 50%;
-            padding: 40px;
-            background: #1F1F2E;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .welcome-box {
-            width: 50%;
-            padding: 40px;
-            background: linear-gradient(45deg, #00CFFF, #6F00FF);
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        .welcome-box h2 {
-            font-size: 28px;
-            margin-bottom: 15px;
-        }
-
-        .welcome-box p {
-            font-size: 16px;
-            margin-bottom: 25px;
-            opacity: 0.9;
-        }
-
-        .form-title {
-            font-size: 24px;
-            margin-bottom: 30px;
-            font-weight: 600;
-            color: #F8F9FA;
-        }
-
-        .social-icons {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .social-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid #00CFFF;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .social-icon:hover {
-            background: #00CFFF;
-        }
-
-        .social-icon i {
-            font-size: 18px;
-            color: #fff;
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 15px 0;
-            font-size: 14px;
-            color: #aaa;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background: #444;
-        }
-
-        .divider span {
-            padding: 0 15px;
-        }
-
-        .input-group {
-            position: relative;
-            margin-bottom: 25px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #333;
-            border-radius: 8px;
-            outline: none;
-            font-size: 15px;
-            background: #121c2b;
-            color: #F8F9FA;
-            transition: all 0.3s ease;
-        }
-
-        .input-group input:focus {
-            border-color: #00CFFF;
-            box-shadow: 0 0 0 2px rgba(0, 207, 255, 0.2);
-        }
-
-        .input-group label {
-            position: absolute;
-            top: 50%;
-            left: 15px;
-            transform: translateY(-50%);
-            pointer-events: none;
-            font-size: 15px;
-            color: #aaa;
-            transition: all 0.3s ease;
-        }
-
-        .input-group input:focus ~ label,
-        .input-group input:valid ~ label {
-            top: 0;
-            left: 12px;
-            font-size: 12px;
-            padding: 0 5px;
-            background: #1F1F2E;
-            color: #00CFFF;
-        }
-
-        .forgot-password {
-            font-size: 14px;
-            text-align: right;
-            margin-bottom: 20px;
-        }
-
-        .forgot-password a {
-            color: #aaa;
-            text-decoration: none;
-        }
-
-        .forgot-password a:hover {
-            color: #00CFFF;
-            text-decoration: underline;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(90deg, #00CFFF, #6F00FF);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-        .btn.secondary {
-            background: #fff;
-            color: #6F00FF;
-            border: 1px solid #6F00FF;
-            margin-top: 20px;
-        }
-
-        .btn.secondary:hover {
-            background: rgba(111, 0, 255, 0.05);
-        }
-
-        .animation {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeIn 0.5s forwards;
-        }
-
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animation {
-            animation-delay: calc(var(--i) * 0.1s);
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                width: 95%;
-                height: auto;
-            }
-
-            .form-section {
-                flex-direction: column-reverse;
-            }
-
-            .form-box,
-            .welcome-box {
-                width: 100%;
-                padding: 30px;
-            }
-
-            .welcome-box {
-                padding: 40px 30px;
-            }
-        }
-    </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="forms-container">
-            <!-- Login Form Section -->
-            <div class="form-section login-section">
-                <div class="form-box">
-                    <h2 class="form-title animation" style="--i:1">Sign In</h2>
-                
-                    <form>
-                        <div class="input-group animation" style="--i:4">
-                            <input type="email" required>
-                            <label>Email</label>
-                        </div>
-                        
-                        <div class="input-group animation" style="--i:5">
-                            <input type="password" required>
-                            <label>Password</label>
-                        </div>
-                        
-                        <div class="forgot-password animation" style="--i:6">
-                            <a href="#">Forgot Your Password?</a>
-                        </div>
-                        
-                        <button type="submit" class="btn animation" style="--i:7">Sign In</button>
-                    </form>
-                </div>
-                
-                <div class="welcome-box">
-                    <h2 class="animation" style="--i:1">Hello, Friend!</h2>
-                    <p class="animation" style="--i:2">Register with your personal details to use all of the features.</p>
-                    <button class="btn secondary animation signup-btn" style="--i:3">SIGN UP</button>
-                </div>
-            </div>
-            
-            <!-- Registration Form Section -->
-            <div class="form-section register-section">
-                <div class="welcome-box">
-                    <h2 class="animation" style="--i:1">Welcome Back!</h2>
-                    <p class="animation" style="--i:2">Enter your personal details to use all of the features.</p>
-                    <button class="btn secondary animation login-btn" style="--i:3">SIGN IN</button>
-                </div>
-                
-                <div class="form-box">
-                    <h2 class="form-title animation" style="--i:1">Create Account</h2>
+    <!-- Canvas para animação de código -->
+    <canvas id="codeCanvas"></canvas>
 
-                    
-                    <div class="divider animation" style="--i:3">
+    <nav>
+        <div class="logo-container">
+            <img src="src/logo_png_cp.svg" alt="logo">
+        </div>
 
-                    </div>
-                    
-                    <form>
-                        <div class="input-group animation" style="--i:4">
-                            <input type="text" required>
-                            <label>Name</label>
-                        </div>
-                        
-                        <div class="input-group animation" style="--i:5">
-                            <input type="email" required>
-                            <label>Email</label>
-                        </div>
-                        
-                        <div class="input-group animation" style="--i:6">
-                            <input type="password" required>
-                            <label>Password</label>
-                        </div>
-                        
-                        <button type="submit" class="btn animation" style="--i:7">SIGN UP</button>
-                    </form>
-                </div>
+        <ul>
+            <a href="#">
+                <li>Suporte</li>
+            </a>
+            <a href="#">
+                <li>Sobre</li>
+            </a>
+        </ul>
+
+        <div class="linkedin-container">
+            <a href="#">
+                <img src="src/link_dev.png" alt="linkedin-logo">
+            </a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="text-container">
+            <h1>Bem vindo ao CodePitch!!!</h1>
+            <p>"Mostre seu código. Venda seu talento. Conquiste o mundo dev um pitch de cada vez!!!"</p>
+
+            <div class="button-redirect">
+                <a href="forms.html">
+                    <button>Vamos começar!</button>
+                </a>
             </div>
         </div>
-    </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <p>CodePitch &copy; 2025</p>
+        </div>
+    </footer>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0F0F0F; /* Preto Fosco - Fundo principal */
+            color: #F8F9FA; /* Branco Neve - Texto principal */
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Canvas para animação de código */
+        #codeCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15; /* Bem discreto */
+        }
+
+        /*---------------------Nav--------------------*/
+        nav {
+            display: flex;
+            align-items: center;
+            margin: 20px;
+            padding: 0;
+            gap: 30px;
+            background-color: rgba(31, 31, 46, 0.8); /* Cinza Azulado com transparência */
+            border-radius: 15px;
+            padding: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        nav img:hover {
+            transform: scale(1.1);
+            cursor: pointer;
+        }
+
+        ul {
+            display: flex;
+            margin: 0;
+            padding: 0;
+            gap: 20px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #F8F9FA; /* Branco Neve - Texto principal */
+        }
+
+        li {
+            list-style-type: none;
+            display: inline-block;
+            font-size: 20px;
+        }
+
+        li:hover {
+            color: #00CFFF; /* Azul Neon - Destaques interativos */
+            cursor: pointer;
+            transform: scale(1.1);
+        }
+
+        .linkedin-container {
+            position: absolute;
+            right: 10px;
+        }
+
+        .linkedin-container img {
+            height: 4vw;
+        }
+
+        .logo-container img {
+            height: 10vw;
+        }
+
+        /*--------------------Main-------------------*/
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50vh;
+            position: relative;
+            z-index: 2;
+        }
+
+        .text-container {
+            text-align: center;
+            background-color: rgba(31, 31, 46, 0.8); /* Cinza Azulado com transparência */
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 207, 255, 0.2); /* Sombra com toque de Azul Neon */
+            backdrop-filter: blur(5px); /* Efeito de desfoque para melhorar legibilidade */
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .text-container h1 {
+            font-size: 40px;
+            color: #6F00FF; /* Roxo Elétrico - Cabeçalhos */
+            text-shadow: 0 0 10px rgba(111, 0, 255, 0.3);
+        }
+
+        .text-container p {
+            font-size: 15px;
+            color: #F8F9FA; /* Branco Neve - Texto principal */
+        }
+
+        .button-redirect button {
+            background-color: #00CFFF; /* Azul Neon - Botões principais */
+            color: #0F0F0F; /* Preto Fosco - Para contraste no botão */
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 7px rgba(111, 0, 255, 0.3); /* Sombra com toque de Roxo Elétrico */
+            font-size: 18px;
+            padding: 12px 48px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .button-redirect button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 10px #6F00FF; /* Roxo Elétrico na hover */
+            background-color: #00CFFF; /* Azul Neon mantido */
+        }
+
+        /*--------------------Footer-------------------*/
+        footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 10vh;
+            background-color: rgba(31, 31, 46, 0.8); /* Cinza Azulado com transparência */
+            margin-top: 20px;
+            position: relative;
+            z-index: 2;
+        }
+            
+        .footer-container p {
+            color: #F8F9FA; /* Branco Neve - Texto */
+        }
+    </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const container = document.querySelector('.container');
-            const formsContainer = document.querySelector('.forms-container');
-            const signupBtn = document.querySelector('.signup-btn');
-            const loginBtn = document.querySelector('.login-btn');
-
-            // Initially show the login form
-            formsContainer.style.transform = 'translateX(0)';
-
-            // Function to reset animations
-            function resetAnimations(sectionClass) {
-                const elements = document.querySelectorAll(`.${sectionClass} .animation`);
-                elements.forEach(el => {
-                    el.style.animation = 'none';
-                    el.offsetHeight; // Trigger reflow
-                    el.style.animation = null;
-                });
+        // Configuração da animação de código no plano de fundo
+        document.addEventListener("DOMContentLoaded", function() {
+            const canvas = document.getElementById('codeCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Definir o tamanho do canvas para preencher a tela
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Ajustar canvas quando a janela for redimensionada
+            window.addEventListener('resize', function() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+            
+            // Caracteres que serão usados na animação (código simulado)
+            const codeChars = [
+                '{', '}', '(', ')', '[', ']', '<', '>',
+                'function', 'const', 'let', 'var', 'if', 'else', 'for', 'while',
+                'return', 'class', 'import', 'export', 'from', 'async', 'await',
+                '=', '==', '===', '+', '-', '*', '/', '%', '&&', '||', '!',
+                '0', '1', 'true', 'false', 'null', 'undefined',
+                ';', '.', ',', ':', '?', '//','#','$'
+            ];
+            
+            // Configurações das colunas de código
+            const columns = Math.floor(canvas.width / 20); // Determina quantas colunas baseado na largura da tela
+            const fontSize = 12;
+            
+            // Array para manter o rastreamento da posição Y de cada coluna
+            const drops = [];
+            
+            // Inicializa as posições Y de cada coluna
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -100;
             }
-
-            // Event for signup button
-            signupBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                formsContainer.style.transform = 'translateX(-50%)';
-                resetAnimations('register-section');
-            });
-
-            // Event for login button
-            loginBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                formsContainer.style.transform = 'translateX(0)';
-                resetAnimations('login-section');
-            });
+            
+            // Configurações de cores da nossa paleta
+            const colors = ['#00CFFF', '#6F00FF', '#F8F9FA'];
+            
+            // Função para desenhar a animação
+            function drawCode() {
+                // Aplica uma camada semi-transparente sobre o canvas para criar o efeito de desvanecimento
+                ctx.fillStyle = 'rgba(15, 15, 15, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Define a fonte para desenhar os caracteres
+                ctx.font = fontSize + 'px monospace';
+                
+                // Para cada coluna
+                for (let i = 0; i < drops.length; i++) {
+                    // Escolhe um caractere aleatório
+                    const text = codeChars[Math.floor(Math.random() * codeChars.length)];
+                    
+                    // Escolhe uma cor aleatória da nossa paleta
+                    ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    // Desenha o caractere
+                    ctx.fillText(text, i * 20, drops[i] * 20);
+                    
+                    // Move a posição Y para baixo
+                    drops[i]++;
+                    
+                    // Se a coluna atingir o fundo ou aleatoriamente, redefina-a para o topo
+                    if (drops[i] * 20 > canvas.height && Math.random() > 0.98) {
+                        drops[i] = 0;
+                    }
+                }
+            }
+            
+            // Executa a função drawCode a cada 55ms
+            setInterval(drawCode, 55);
         });
     </script>
 </body>
