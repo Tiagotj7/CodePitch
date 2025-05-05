@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="src/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="src/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="src/favicon-16x16.png">
+    <link rel="manifest" href="src/site.webmanifest">
+    <link rel="mask-icon" href="src/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="shortcut icon" href="src/favicon.ico">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+
+    <title>Temas - Configurações</title>
+
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <div class="user-profile">
+                <span class="user-icon">👤</span>
+            </div>
+            <span class="user-name">Nome</span>
+        </div>
+        
+        <div class="navbar-right">
+            <a href="#" class="home-icon">🏠</a>
+            <div class="codepitch-logo">
+                <span class="code-gradient">Code</span><span class="pitch-text">Pitch</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="content-container">
+        <div class="sidebar">
+            <div class="sidebar-title">Conta</div>
+            
+            <div class="sidebar-menu">
+                <div class="sidebar-item">Configurações de perfil</div>
+                <div class="sidebar-item">Senha e Segurança</div>
+                
+                <div class="category-title">Preferências</div>
+                <div class="sidebar-item active">Tema</div>
+                <div class="sidebar-item">Notificação</div>
+                
+                <div class="category-title">Privado</div>
+                <div class="sidebar-item">Controle de Data</div>
+                <div class="sidebar-item">Usuários Bloqueados</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <h1 class="page-title">Temas</h1>
+            
+            <div class="theme-options">
+                <div class="theme-option">
+                    <span class="theme-name">Claro:</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="theme-option">
+                    <span class="theme-name">Escuro:</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple script to make toggle switches mutually exclusive
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggles = document.querySelectorAll('.toggle-switch input');
+            
+            toggles.forEach(toggle => {
+                toggle.addEventListener('change', function() {
+                    // If this toggle is checked, uncheck the other one
+                    if (this.checked) {
+                        toggles.forEach(otherToggle => {
+                            if (otherToggle !== this) {
+                                otherToggle.checked = false;
+                            }
+                        });
+                    } else {
+                        // Don't allow both to be unchecked - check the other one
+                        toggles.forEach(otherToggle => {
+                            if (otherToggle !== this) {
+                                otherToggle.checked = true;
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --navbar-bg: #1a1a1a;
+            --sidebar-bg: #111827;
+            --sidebar-hover: #1e293b;
+            --sidebar-active: #1e293b;
+            --input-border: #374151;
+            --category-text: #d1d5db;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f5f5f5;
+            --text-color: #333333;
+            --navbar-bg: #ffffff;
+            --sidebar-bg: #e2e8f0;
+            --sidebar-hover: #cbd5e1;
+            --sidebar-active: #cbd5e1;
+            --input-border: #cbd5e1;
+            --category-text: #64748b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--navbar-bg);
+            color: var(--text-color);
+            z-index: 10;
+            transition: background-color 0.3s;
+        }
+        
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            background-color: #64baff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .user-name {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .logo-text {
+            background: linear-gradient(90deg, #8A2BE2, #4169E1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .codepitch-logo {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .code-gradient {
+            background: linear-gradient(90deg, #8A2BE2, #4169E1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .pitch-text {
+            color: white;
+        }
+        
+        .home-icon {
+            font-size: 1.5rem;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .user-icon {
+            font-size: 1.5rem;
+        }
+        
+        .content-container {
+            display: flex;
+            flex: 1;
+            padding: 10px;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            padding: 20px;
+            border-radius: 12px;
+            height: fit-content;
+            transition: background-color 0.3s;
+        }
+        
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding: 10px 0;
+        }
+        
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .sidebar-item {
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .sidebar-item:hover {
+            background-color: var(--sidebar-hover);
+        }
+        
+        .sidebar-item.active {
+            background-color: var(--sidebar-active);
+        }
+        
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        
+        .category-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0 10px 0;
+            color: var(--category-text);
+            transition: color 0.3s;
+        }
+        
+        .theme-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .theme-name {
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #4169E1;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+    </style>
+    
+</body>
+</html>
