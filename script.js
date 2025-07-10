@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     auth.signInWithEmailAndPassword(email, password)
       .then(() => {
-        window.location.href = 'config1.html';
+        window.location.href = 'start.html';
       })
       .catch(error => {
         alert("Erro no login: " + error.message);
