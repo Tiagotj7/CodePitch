@@ -1,365 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login & Registration</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 
-    <link rel="apple-touch-icon" sizes="180x180" href="src/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="src/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="src/favicon-16x16.png">
-    <link rel="manifest" href="src/site.webmanifest">
-    <link rel="mask-icon" href="src/safari-pinned-tab.svg" color="#5bbad5">
-    <link rel="shortcut icon" href="src/favicon.ico">
-    <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="msapplication-config" content="/browserconfig.xml">
-    <meta name="theme-color" content="#ffffff">
-
-    <form action="register.php" method="POST">
-
-        <title>Login & Registration</title>
-
-        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-                font-family: 'Segoe UI', 'Roboto', sans-serif;
-            }
-
-            body {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                background: #0F0F0F;
-            }
-
-            .container {
-                position: relative;
-                width: 800px;
-                height: 500px;
-                background: #1F1F2E;
-                border-radius: 20px;
-                box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
-                overflow: hidden;
-            }
-
-            .forms-container {
-                position: absolute;
-                width: 200%;
-                height: 100%;
-                display: flex;
-                transition: transform 0.6s ease-in-out;
-            }
-
-            .form-section {
-                width: 50%;
-                height: 100%;
-                display: flex;
-            }
-
-            .form-box {
-                width: 50%;
-                padding: 40px;
-                background: #1F1F2E;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }
-
-            .welcome-box {
-                width: 50%;
-                padding: 40px;
-                background: linear-gradient(45deg, #00CFFF, #6F00FF);
-                color: #fff;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-            }
-
-            .welcome-box h2 {
-                font-size: 28px;
-                margin-bottom: 15px;
-            }
-
-            .welcome-box p {
-                font-size: 16px;
-                margin-bottom: 25px;
-                opacity: 0.9;
-            }
-
-            .form-title {
-                font-size: 24px;
-                margin-bottom: 30px;
-                font-weight: 600;
-                color: #F8F9FA;
-            }
-
-            .social-icons {
-                display: flex;
-                justify-content: center;
-                margin-bottom: 20px;
-            }
-
-            .social-icon {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                border: 1px solid #00CFFF;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin: 0 8px;
-                cursor: pointer;
-                transition: all 0.3s ease;
-            }
-
-            .social-icon:hover {
-                background: #00CFFF;
-            }
-
-            .social-icon i {
-                font-size: 18px;
-                color: #fff;
-            }
-
-            .input-group {
-                position: relative;
-                margin-bottom: 25px;
-            }
-
-            .input-group input {
-                width: 100%;
-                padding: 12px 15px;
-                border: 1px solid #333;
-                border-radius: 8px;
-                outline: none;
-                font-size: 15px;
-                background: #121c2b;
-                color: #F8F9FA;
-                transition: all 0.3s ease;
-            }
-
-            .input-group input:focus {
-                border-color: #00CFFF;
-                box-shadow: 0 0 0 2px rgba(0, 207, 255, 0.2);
-            }
-
-            .input-group label {
-                position: absolute;
-                top: 50%;
-                left: 15px;
-                transform: translateY(-50%);
-                pointer-events: none;
-                font-size: 15px;
-                color: #aaa;
-                transition: all 0.3s ease;
-            }
-
-            .input-group input:focus~label,
-            .input-group input:valid~label {
-                top: 0;
-                left: 12px;
-                font-size: 12px;
-                padding: 0 5px;
-                background: #1F1F2E;
-                color: #00CFFF;
-            }
-
-            .forgot-password {
-                font-size: 14px;
-                text-align: right;
-                margin-bottom: 20px;
-            }
-
-            .forgot-password a {
-                color: #aaa;
-                text-decoration: none;
-            }
-
-            .forgot-password a:hover {
-                color: #00CFFF;
-                text-decoration: underline;
-            }
-
-            .btn {
-                width: 100%;
-                padding: 12px;
-                background: linear-gradient(90deg, #00CFFF, #6F00FF);
-                color: #fff;
-                border: none;
-                border-radius: 8px;
-                font-size: 16px;
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.3s ease;
-            }
-
-            .btn:hover {
-                opacity: 0.9;
-            }
-
-            .btn.secondary {
-                background: #fff;
-                color: #6F00FF;
-                border: 1px solid #6F00FF;
-                margin-top: 20px;
-            }
-
-            .btn.secondary:hover {
-                background: rgba(111, 0, 255, 0.05);
-            }
-
-            .animation {
-                opacity: 0;
-                transform: translateY(20px);
-                animation: fadeIn 0.5s forwards;
-            }
-
-            @keyframes fadeIn {
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-
-            .animation {
-                animation-delay: calc(var(--i) * 0.1s);
-            }
-
-            @media (max-width: 768px) {
-                .container {
-                    width: 95%;
-                    height: auto;
-                }
-
-                .form-section {
-                    flex-direction: column-reverse;
-                }
-
-                .form-box,
-                .welcome-box {
-                    width: 100%;
-                    padding: 30px;
-                }
-
-                .welcome-box {
-                    padding: 40px 30px;
-                }
-            }
-        </style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth-compat.js"></script>
 </head>
-
 <body>
-    <div class="container">
-        <div class="forms-container">
-            <!-- Login Form Section -->
-            <div class="form-section login-section">
-                <div class="form-box">
-                    <h2 class="form-title animation" style="--i:1">Sign In</h2>
-
-                    <form action="register.php" method="post"> <!-- You'll need to create this PHP file -->
-                        <div class="input-group animation" style="--i:4">
-                            <input type="email" name="email" required>
-                            <label>Email</label>
-                        </div>
-
-                        <div class="input-group animation" style="--i:5">
-                            <input type="password" name="password" required>
-                            <label>Password</label>
-                        </div>
-
-                        <div class="forgot-password animation" style="--i:6">
-                            <a href="#">Forgot Your Password?</a>
-                        </div>
-
-                        <button type="submit" class="btn animation" style="--i:7">Sign In</button>
-                    </form>
-                </div>
-
-                <div class="welcome-box">
-                    <h2 class="animation" style="--i:1">Hello, Friend!</h2>
-                    <p class="animation" style="--i:2">Register with your personal details to use all of the features.
-                    </p>
-                    <button class="btn secondary animation signup-btn" style="--i:3">SIGN UP</button>
-                </div>
+  <div class="container">
+    <div class="forms-container">
+      <!-- Login Form Section -->
+      <div class="form-section login-section">
+        <div class="form-box">
+          <h2 class="form-title animation" style="--i:1">Sign In</h2>
+          <form id="login-form">
+            <div class="input-group animation" style="--i:4">
+              <input type="email" name="email" required />
+              <label>Email</label>
             </div>
-
-            <!-- Registration Form Section -->
-            <div class="form-section register-section">
-                <div class="welcome-box">
-                    <h2 class="animation" style="--i:1">Welcome Back!</h2>
-                    <p class="animation" style="--i:2">Enter your personal details to use all of the features.</p>
-                    <button class="btn secondary animation login-btn" style="--i:3">SIGN IN</button>
-                </div>
-
-                <div class="form-box">
-                    <h2 class="form-title animation" style="--i:1">Create Account</h2>
-
-                    <form action="register.php" method="POST">
-                        <div class="input-group animation" style="--i:4">
-                            <input type="text" name="name" required>
-                            <label>Name</label>
-                        </div>
-
-                        <div class="input-group animation" style="--i:5">
-                            <input type="email" name="email" required>
-                            <label>Email</label>
-                        </div>
-
-                        <div class="input-group animation" style="--i:6">
-                            <input type="password" name="password" required>
-                            <label>Password</label>
-                        </div>
-
-                        <button type="submit" class="btn animation" style="--i:7">SIGN UP</button>
-                    </form>
-                </div>
+            <div class="input-group animation" style="--i:5">
+              <input type="password" name="password" required />
+              <label>Password</label>
             </div>
+            <div class="forgot-password animation" style="--i:6">
+              <a href="#">Forgot Your Password?</a>
+            </div>
+            <button type="submit" class="btn animation" style="--i:7">Sign In</button>
+          </form>
         </div>
+        <div class="welcome-box">
+          <h2 class="animation" style="--i:1">Hello, Friend!</h2>
+          <p class="animation" style="--i:2">Register with your personal details to use all of the features.</p>
+          <button class="btn secondary animation signup-btn" style="--i:3">SIGN UP</button>
+        </div>
+      </div>
+
+      <!-- Registration Form Section -->
+      <div class="form-section register-section">
+        <div class="welcome-box">
+          <h2 class="animation" style="--i:1">Welcome Back!</h2>
+          <p class="animation" style="--i:2">Enter your personal details to use all of the features.</p>
+          <button class="btn secondary animation login-btn" style="--i:3">SIGN IN</button>
+        </div>
+        <div class="form-box">
+          <h2 class="form-title animation" style="--i:1">Create Account</h2>
+          <form id="register-form">
+            <div class="input-group animation" style="--i:4">
+              <input type="text" name="name" required />
+              <label>Name</label>
+            </div>
+            <div class="input-group animation" style="--i:5">
+              <input type="email" name="email" required />
+              <label>Email</label>
+            </div>
+            <div class="input-group animation" style="--i:6">
+              <input type="password" name="password" required />
+              <label>Password</label>
+            </div>
+            <button type="submit" class="btn animation" style="--i:7">SIGN UP</button>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const container = document.querySelector('.container');
-            const formsContainer = document.querySelector('.forms-container');
-            const signupBtn = document.querySelector('.signup-btn');
-            const loginBtn = document.querySelector('.login-btn');
-
-            // Initially show the login form
-            formsContainer.style.transform = 'translateX(0)';
-
-            // Function to reset animations
-            function resetAnimations(sectionClass) {
-                const elements = document.querySelectorAll(`.${sectionClass} .animation`);
-                elements.forEach(el => {
-                    el.style.animation = 'none';
-                    el.offsetHeight; // Trigger reflow
-                    el.style.animation = null;
-                });
-            }
-
-            // Event for signup button
-            signupBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                formsContainer.style.transform = 'translateX(-50%)';
-                resetAnimations('register-section');
-            });
-
-            // Event for login button
-            loginBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                formsContainer.style.transform = 'translateX(0)';
-                resetAnimations('login-section');
-            });
-        });
-    </script>
+  <script src="script.js"></script>
 </body>
-
 </html>
