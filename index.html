@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
     <link rel="apple-touch-icon" sizes="180x180" href="src/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="src/favicon-32x32.png">
@@ -15,273 +14,712 @@
     <meta name="msapplication-config" content="/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
 
-    <link rel="stylesheet" href="style.css">
-
-    <title>CodePitch</title>
+  <title>CodePit</title>
 
 </head>
-
 <body>
-    <!-- Canvas para animação de código -->
-    <canvas id="codeCanvas"></canvas>
 
-    <nav>
-        <div class="logo-container">
-            <img src="src/logo_png_cp.svg" alt="logo">
-        </div>
+  <header id="navbar">
+    <div class="navbar">
+      <h1>CodePitch</h1>
+      <nav class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">Explorar Projetos</a>
+        <a href="form.html" class="cta-button">
+          <span class="cta-text">Entrar</span>
+          <span class="cta-icon">🚀</span>
+        </a>
+      </nav>
+    </div>
+  </header>
 
-        <ul>
-            <a href="#">
-                <li>Suporte</li>
-            </a>
-            <a href="#">
-                <li>Sobre</li>
-            </a>
-        </ul>
+  <section class="hero">
+    <h2>Bem-vindo ao CodePitch</h2>
+    <p>Conectando desenvolvedores através de projetos inovadores na tecnologia</p>
+  </section>
 
-        <div class="linkedin-container">
-            <a href="#">
-                <img src="src/link_dev.png" alt="linkedin-logo">
-            </a>
-        </div>
-    </nav>
+  <section class="carousel-container">
+    <div class="carousel-track" id="carouselTrack">
+      <div class="carousel-slide">
+        <h3>Projetos Web</h3>
+        <p>Descubra aplicações web inovadoras criadas pela comunidade.</p>
+      </div>
+      <div class="carousel-slide">
+        <h3>Apps Mobile</h3>
+        <p>Explore aplicativos móveis desenvolvidos por talentos emergentes.</p>
+      </div>
+      <div class="carousel-slide">
+        <h3>Análise de Dados</h3>
+        <p>Veja projetos de ciência de dados e machine learning.</p>
+      </div>
+    </div>
 
-    <main>
-        <div class="text-container">
-            <h1>Bem vindo ao CodePitch!!!</h1>
-            <p>"Mostre seu código. Venda seu talento. Conquiste o mundo dev um pitch de cada vez!!!"</p>
+    <div class="carousel-buttons">
+      <button id="prevBtn">&#10094;</button>
+      <button id="nextBtn">&#10095;</button>
+    </div>
 
-            <div class="button-redirect">
-                <a href="forms.html">
-                    <button>Vamos começar!</button>
-                </a>
-            </div>
-        </div>
-    </main>
+    <div class="carousel-nav">
+      <span class="nav-dot active" data-slide="0"></span>
+      <span class="nav-dot" data-slide="1"></span>
+      <span class="nav-dot" data-slide="2"></span>
+    </div>
+  </section>
 
-    <footer>
-        <div class="footer-container">
-            <p>CodePitch &copy; 2025</p>
-        </div>
-    </footer>
+  <section class="projects-section">
+    <h2>Projetos em Destaque</h2>
+    <div class="projects-grid" id="projectsGrid">
+      <!-- Projects will be populated by JavaScript -->
+    </div>
+  </section>
 
-    <style>
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #0F0F0F; /* Preto Fosco - Fundo principal */
-            color: #F8F9FA; /* Branco Neve - Texto principal */
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            overflow-x: hidden;
-            position: relative;
-        }
+  <!-- Comments Modal -->
+  <div id="commentsModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="modalTitle">Comentários</h2>
+      
+      <div class="comment-form">
+        <textarea id="commentText" placeholder="Deixe seu comentário..."></textarea>
+        <button onclick="addComment()">Enviar Comentário</button>
+      </div>
+      
+      <div class="comments-list" id="commentsList">
+        <!-- Comments will be populated here -->
+      </div>
+    </div>
+  </div>
 
-        /* Canvas para animação de código */
-        #codeCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.15; /* Bem discreto */
-        }
-
-        /*---------------------Nav--------------------*/
-        nav {
-            display: flex;
-            align-items: center;
-            margin: 20px;
-            padding: 0;
-            gap: 30px;
-            border-radius: 15px;
-            position: relative;
-            z-index: 2;
-        }
-
-        nav img:hover {
-            transform: scale(1.1);
-            cursor: pointer;
-        }
-
-        ul {
-            display: flex;
-            margin: 0;
-            padding: 0;
-            gap: 20px;
-        }
-
-        a {
-            text-decoration: none;
-            color: #F8F9FA; /* Branco Neve - Texto principal */
-        }
-
-        li {
-            list-style-type: none;
-            display: inline-block;
-            font-size: 20px;
-        }
-
-        li:hover {
-            color: #00CFFF; /* Azul Neon - Destaques interativos */
-            cursor: pointer;
-            transform: scale(1.1);
-        }
-
-        .linkedin-container {
-            position: absolute;
-            right: 10px;
-        }
-
-        .linkedin-container img {
-            height: 4vw;
-        }
-
-        .logo-container img {
-            height: 10vw;
-        }
-
-        /*--------------------Main-------------------*/
-        main {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 50vh;
-            position: relative;
-            z-index: 2;
-        }
-
-        .text-container {
-            text-align: center;
-            background-color: rgba(31, 31, 46, 0.8); /* Cinza Azulado com transparência */
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0, 207, 255, 0.2); /* Sombra com toque de Azul Neon */
-            backdrop-filter: blur(5px); /* Efeito de desfoque para melhorar legibilidade */
-            -webkit-backdrop-filter: blur(5px);
-        }
-
-        .text-container h1 {
-            font-size: 40px;
-            color: #6F00FF; /* Roxo Elétrico - Cabeçalhos */
-            text-shadow: 0 0 10px rgba(111, 0, 255, 0.3);
-        }
-
-        .text-container p {
-            font-size: 15px;
-            color: #F8F9FA; /* Branco Neve - Texto principal */
-        }
-
-        .button-redirect button {
-            background-color: #00CFFF; /* Azul Neon - Botões principais */
-            color: #0F0F0F; /* Preto Fosco - Para contraste no botão */
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            box-shadow: 0 4px 7px rgba(111, 0, 255, 0.3); /* Sombra com toque de Roxo Elétrico */
-            font-size: 18px;
-            padding: 12px 48px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .button-redirect button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 2px 10px #6F00FF; /* Roxo Elétrico na hover */
-            background-color: #00CFFF; /* Azul Neon mantido */
-        }
-
-        /*--------------------Footer-------------------*/
-        footer {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 10vh;
-            margin-top: 20px;
-            position: relative;
-            z-index: 2;
-        }
-            
-        .footer-container p {
-            color: #F8F9FA; /* Branco Neve - Texto */
-        }
-    </style>
-
-    <script>
-        // Configuração da animação de código no plano de fundo
-        document.addEventListener("DOMContentLoaded", function() {
-            const canvas = document.getElementById('codeCanvas');
-            const ctx = canvas.getContext('2d');
-            
-            // Definir o tamanho do canvas para preencher a tela
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            
-            // Ajustar canvas quando a janela for redimensionada
-            window.addEventListener('resize', function() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            });
-            
-            // Caracteres que serão usados na animação (código simulado)
-            const codeChars = [
-                '{', '}', '(', ')', '[', ']', '<', '>',
-                'function', 'const', 'let', 'var', 'if', 'else', 'for', 'while',
-                'return', 'class', 'import', 'export', 'from', 'async', 'await',
-                '=', '==', '===', '+', '-', '*', '/', '%', '&&', '||', '!',
-                '0', '1', 'true', 'false', 'null', 'undefined',
-                ';', '.', ',', ':', '?', '//','#','$'
-            ];
-            
-            // Configurações das colunas de código
-            const columns = Math.floor(canvas.width / 20); // Determina quantas colunas baseado na largura da tela
-            const fontSize = 12;
-            
-            // Array para manter o rastreamento da posição Y de cada coluna
-            const drops = [];
-            
-            // Inicializa as posições Y de cada coluna
-            for (let i = 0; i < columns; i++) {
-                drops[i] = Math.random() * -100;
-            }
-            
-            // Configurações de cores da nossa paleta
-            const colors = ['#00CFFF', '#6F00FF', '#F8F9FA'];
-            
-            // Função para desenhar a animação
-            function drawCode() {
-                // Aplica uma camada semi-transparente sobre o canvas para criar o efeito de desvanecimento
-                ctx.fillStyle = 'rgba(15, 15, 15, 0.05)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Define a fonte para desenhar os caracteres
-                ctx.font = fontSize + 'px monospace';
-                
-                // Para cada coluna
-                for (let i = 0; i < drops.length; i++) {
-                    // Escolhe um caractere aleatório
-                    const text = codeChars[Math.floor(Math.random() * codeChars.length)];
-                    
-                    // Escolhe uma cor aleatória da nossa paleta
-                    ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
-                    
-                    // Desenha o caractere
-                    ctx.fillText(text, i * 20, drops[i] * 20);
-                    
-                    // Move a posição Y para baixo
-                    drops[i]++;
-                    
-                    // Se a coluna atingir o fundo ou aleatoriamente, redefina-a para o topo
-                    if (drops[i] * 20 > canvas.height && Math.random() > 0.98) {
-                        drops[i] = 0;
-                    }
-                }
-            }
-            
-            // Executa a função drawCode a cada 55ms
-            setInterval(drawCode, 55);
-        });
-    </script>
 </body>
 </html>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0d1117;
+      color: #c9d1d9;
+    }
+
+    header {
+      position: fixed;
+      width: 100%;
+      background-color: #161b22;
+      padding: 1rem 2rem;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    header.scrolled {
+      background-color: #0d1117;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .navbar h1 {
+      color: #58a6ff;
+      font-size: 1.8rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #c9d1d9;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: #58a6ff;
+    }
+
+    /* CTA Button Styles */
+    .cta-button {
+      background-color: #58a6ff;
+      color: white !important;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: all 0.2s ease;
+      border: 1px solid #58a6ff;
+    }
+
+    .cta-button:hover {
+      background-color: #4595ff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(88, 166, 255, 0.2);
+    }
+
+    .cta-text {
+      font-size: 0.95rem;
+    }
+
+    .cta-icon {
+      font-size: 1rem;
+    }
+
+    .hero {
+      padding-top: 100px;
+      text-align: center;
+      background: linear-gradient(to bottom, #161b22, #0d1117);
+      padding-bottom: 3rem;
+    }
+
+    .hero h2 {
+      font-size: 2.5rem;
+      color: #58a6ff;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: #8b949e;
+    }
+
+    /* Carousel */
+    .carousel-container {
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+      max-width: 1000px;
+      margin: 2rem auto;
+      border-radius: 12px;
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .carousel-slide {
+      min-width: 100%;
+      padding: 2rem;
+      background-color: #161b22;
+      text-align: center;
+    }
+
+    .carousel-slide h3 {
+      color: #58a6ff;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .carousel-slide p {
+      color: #c9d1d9;
+    }
+
+    .carousel-nav {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .nav-dot {
+      width: 10px;
+      height: 10px;
+      background-color: #8b949e;
+      border-radius: 50%;
+      margin: 0 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .nav-dot.active {
+      background-color: #58a6ff;
+    }
+
+    .carousel-buttons {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      transform: translateY(-50%);
+    }
+
+    .carousel-buttons button {
+      background: none;
+      border: none;
+      color: #58a6ff;
+      font-size: 2rem;
+      cursor: pointer;
+      padding: 1rem;
+    }
+
+    /* Projects Section */
+    .projects-section {
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+    }
+
+    .projects-section h2 {
+      text-align: center;
+      color: #58a6ff;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+    }
+
+    .project-card {
+      background-color: #161b22;
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid #30363d;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .project-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(88, 166, 255, 0.2);
+    }
+
+    .project-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .project-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #58a6ff, #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      margin-right: 1rem;
+    }
+
+    .project-author {
+      flex-grow: 1;
+    }
+
+    .project-author h3 {
+      color: #c9d1d9;
+      font-size: 1.1rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .project-location {
+      color: #8b949e;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .project-image {
+      width: 100%;
+      height: 200px;
+      background-color: #21262d;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .project-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .project-description {
+      color: #c9d1d9;
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    .project-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .comment-btn {
+      background-color: #238636;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .comment-btn:hover {
+      background-color: #2ea043;
+    }
+
+    .project-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      background-color: #58a6ff;
+      color: #0d1117;
+      padding: 0.2rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    /* Comments Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-content {
+      background-color: #161b22;
+      margin: 5% auto;
+      padding: 2rem;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .close {
+      color: #8b949e;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: #c9d1d9;
+    }
+
+    .comment-form {
+      margin-bottom: 2rem;
+    }
+
+    .comment-form textarea {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #c9d1d9;
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .comment-form button {
+      background-color: #58a6ff;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+
+    .comments-list {
+      border-top: 1px solid #30363d;
+      padding-top: 1rem;
+    }
+
+    .comment {
+      background-color: #21262d;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .comment-author {
+      color: #58a6ff;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .cta-button {
+        order: -1;
+        margin-bottom: 1rem;
+      }
+
+      .hero h2 {
+        font-size: 2rem;
+      }
+
+      .carousel-slide h3 {
+        font-size: 1.2rem;
+      }
+
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .project-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .project-avatar {
+        margin-bottom: 0.5rem;
+      }
+    }
+  </style>
+
+    <script>
+    // Sample projects data
+    const projects = [
+      {
+        id: 1,
+        author: "Maria Silva",
+        location: "São Paulo, SP",
+        image: "https://via.placeholder.com/400x200/58a6ff/ffffff?text=E-commerce+App",
+        description: "Aplicação de e-commerce completa com sistema de pagamento integrado, gestão de produtos e painel administrativo. Desenvolvida com React e Node.js.",
+        tags: ["React", "Node.js", "MongoDB"]
+      },
+      {
+        id: 2,
+        author: "João Santos",
+        location: "Rio de Janeiro, RJ",
+        image: "https://via.placeholder.com/400x200/7c3aed/ffffff?text=Data+Analytics",
+        description: "Dashboard interativo para análise de dados de vendas com visualizações em tempo real. Utiliza Python, Pandas e Plotly para gerar insights valiosos.",
+        tags: ["Python", "Pandas", "Plotly"]
+      },
+      {
+        id: 3,
+        author: "Ana Costa",
+        location: "Belo Horizonte, MG",
+        image: "https://via.placeholder.com/400x200/f59e0b/ffffff?text=Mobile+App",
+        description: "Aplicativo mobile para gerenciamento de tarefas com sincronização na nuvem. Interface intuitiva desenvolvida em React Native com backend em Firebase.",
+        tags: ["React Native", "Firebase", "UX/UI"]
+      },
+      {
+        id: 4,
+        author: "Carlos Oliveira",
+        location: "Porto Alegre, RS",
+        image: "https://via.placeholder.com/400x200/10b981/ffffff?text=AI+Chatbot",
+        description: "Chatbot inteligente para atendimento ao cliente usando processamento de linguagem natural. Integrado com APIs de machine learning e WebSocket.",
+        tags: ["Python", "NLP", "TensorFlow"]
+      },
+      {
+        id: 5,
+        author: "Fernanda Lima",
+        location: "Recife, PE",
+        image: "https://via.placeholder.com/400x200/ef4444/ffffff?text=Game+Dev",
+        description: "Jogo indie 2D desenvolvido em Unity com mecânicas inovadoras de puzzle. Arte pixel art original e trilha sonora composta exclusivamente para o projeto.",
+        tags: ["Unity", "C#", "Game Design"]
+      },
+      {
+        id: 6,
+        author: "Pedro Rocha",
+        location: "Salvador, BA",
+        image: "https://via.placeholder.com/400x200/8b5cf6/ffffff?text=Blockchain+DApp",
+        description: "Aplicação descentralizada para marketplace de NFTs com smart contracts seguros. Desenvolvida em Solidity com frontend em React e Web3.js.",
+        tags: ["Solidity", "Web3", "Blockchain"]
+      }
+    ];
+
+    // Comments storage
+    let comments = {};
+
+    // Initialize projects
+    function initProjects() {
+      const grid = document.getElementById('projectsGrid');
+      
+      projects.forEach(project => {
+        const projectCard = document.createElement('div');
+        projectCard.className = 'project-card';
+        projectCard.innerHTML = `
+          <div class="project-header">
+            <div class="project-avatar">
+              ${project.author.split(' ').map(n => n[0]).join('')}
+            </div>
+            <div class="project-author">
+              <h3>${project.author}</h3>
+              <div class="project-location">
+                📍 ${project.location}
+              </div>
+            </div>
+          </div>
+          
+          <div class="project-image">
+            <img src="${project.image}" alt="Projeto de ${project.author}">
+          </div>
+          
+          <div class="project-description">
+            ${project.description}
+          </div>
+          
+          <div class="project-actions">
+            <button class="comment-btn" onclick="openComments(${project.id}, '${project.author}')">
+              💬 Comentários
+            </button>
+            <div class="project-tags">
+              ${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+            </div>
+          </div>
+        `;
+        
+        grid.appendChild(projectCard);
+      });
+    }
+
+    // Comments functionality
+    function openComments(projectId, authorName) {
+      const modal = document.getElementById('commentsModal');
+      const modalTitle = document.getElementById('modalTitle');
+      modalTitle.textContent = `Comentários - Projeto de ${authorName}`;
+      modal.style.display = 'block';
+      modal.dataset.projectId = projectId;
+      
+      loadComments(projectId);
+    }
+
+    function closeModal() {
+      document.getElementById('commentsModal').style.display = 'none';
+    }
+
+    function addComment() {
+      const modal = document.getElementById('commentsModal');
+      const projectId = modal.dataset.projectId;
+      const commentText = document.getElementById('commentText').value.trim();
+      
+      if (!commentText) return;
+      
+      if (!comments[projectId]) {
+        comments[projectId] = [];
+      }
+      
+      const comment = {
+        id: Date.now(),
+        author: 'Usuário Anônimo',
+        text: commentText,
+        timestamp: new Date().toLocaleString('pt-BR')
+      };
+      
+      comments[projectId].push(comment);
+      document.getElementById('commentText').value = '';
+      loadComments(projectId);
+    }
+
+    function loadComments(projectId) {
+      const commentsList = document.getElementById('commentsList');
+      const projectComments = comments[projectId] || [];
+      
+      if (projectComments.length === 0) {
+        commentsList.innerHTML = '<p style="color: #8b949e; text-align: center;">Nenhum comentário ainda. Seja o primeiro!</p>';
+        return;
+      }
+      
+      commentsList.innerHTML = projectComments.map(comment => `
+        <div class="comment">
+          <div class="comment-author">${comment.author}</div>
+          <div>${comment.text}</div>
+          <div style="color: #8b949e; font-size: 0.8rem; margin-top: 0.5rem;">${comment.timestamp}</div>
+        </div>
+      `).join('');
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('commentsModal');
+      if (event.target === modal) {
+        closeModal();
+      }
+    };
+
+    // Carousel functionality
+    const track = document.getElementById('carouselTrack');
+    const slides = track.children;
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const navDots = document.querySelectorAll('.nav-dot');
+    const navbar = document.getElementById('navbar');
+    
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+    
+    function updateCarousel() {
+      track.style.transform = `translateX(-${currentSlide * 100}%)`;
+      navDots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlide);
+      });
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      updateCarousel();
+    }
+
+    function prevSlide() {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      updateCarousel();
+    }
+
+    nextBtn.addEventListener('click', nextSlide);
+    prevBtn.addEventListener('click', prevSlide);
+
+    navDots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        currentSlide = parseInt(dot.dataset.slide);
+        updateCarousel();
+      });
+    });
+
+    // Auto-slide every 7 seconds
+    setInterval(nextSlide, 7000);
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 10) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Initialize the page
+    initProjects();
+  </script>
