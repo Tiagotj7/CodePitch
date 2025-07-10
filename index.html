@@ -14,84 +14,12 @@
     <meta name="msapplication-config" content="/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
 
-  <title>CodePit</title>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth-compat.js"></script>
 
-</head>
-<body>
-
-  <header id="navbar">
-    <div class="navbar">
-      <h1>CodePitch</h1>
-      <nav class="nav-links">
-        <a href="#">Home</a>
-        <a href="#">Explorar Projetos</a>
-        <a href="form.html" class="cta-button">
-          <span class="cta-text">Entrar</span>
-          <span class="cta-icon">🚀</span>
-        </a>
-      </nav>
-    </div>
-  </header>
-
-  <section class="hero">
-    <h2>Bem-vindo ao CodePitch</h2>
-    <p>Conectando desenvolvedores através de projetos inovadores na tecnologia</p>
-  </section>
-
-  <section class="carousel-container">
-    <div class="carousel-track" id="carouselTrack">
-      <div class="carousel-slide">
-        <h3>Projetos Web</h3>
-        <p>Descubra aplicações web inovadoras criadas pela comunidade.</p>
-      </div>
-      <div class="carousel-slide">
-        <h3>Apps Mobile</h3>
-        <p>Explore aplicativos móveis desenvolvidos por talentos emergentes.</p>
-      </div>
-      <div class="carousel-slide">
-        <h3>Análise de Dados</h3>
-        <p>Veja projetos de ciência de dados e machine learning.</p>
-      </div>
-    </div>
-
-    <div class="carousel-buttons">
-      <button id="prevBtn">&#10094;</button>
-      <button id="nextBtn">&#10095;</button>
-    </div>
-
-    <div class="carousel-nav">
-      <span class="nav-dot active" data-slide="0"></span>
-      <span class="nav-dot" data-slide="1"></span>
-      <span class="nav-dot" data-slide="2"></span>
-    </div>
-  </section>
-
-  <section class="projects-section">
-    <h2>Projetos em Destaque</h2>
-    <div class="projects-grid" id="projectsGrid">
-      <!-- Projects will be populated by JavaScript -->
-    </div>
-  </section>
-
-  <!-- Comments Modal -->
-  <div id="commentsModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h2 id="modalTitle">Comentários</h2>
-      
-      <div class="comment-form">
-        <textarea id="commentText" placeholder="Deixe seu comentário..."></textarea>
-        <button onclick="addComment()">Enviar Comentário</button>
-      </div>
-      
-      <div class="comments-list" id="commentsList">
-        <!-- Comments will be populated here -->
-      </div>
-    </div>
-  </div>
-
-</body>
-</html>
+  <title>CodePitch</title>
 
   <style>
     * {
@@ -165,6 +93,7 @@
       gap: 0.3rem;
       transition: all 0.2s ease;
       border: 1px solid #58a6ff;
+      cursor: pointer;
     }
 
     .cta-button:hover {
@@ -474,6 +403,215 @@
       margin-bottom: 0.5rem;
     }
 
+    /* Login/Register Popup Styles */
+    .auth-modal {
+      display: none;
+      position: fixed;
+      z-index: 3000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(5px);
+    }
+
+    .auth-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .auth-close {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      color: #8b949e;
+      font-size: 2rem;
+      cursor: pointer;
+      z-index: 3001;
+      transition: color 0.3s;
+    }
+
+    .auth-close:hover {
+      color: #c9d1d9;
+    }
+
+    .forms-container {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      height: 500px;
+      background: linear-gradient(135deg, #161b22, #0d1117);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-section {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      transition: all 0.8s ease-in-out;
+    }
+
+    .form-section.register-section {
+      transform: translateX(100%);
+    }
+
+    .form-section.active {
+      transform: translateX(0);
+    }
+
+    .form-section.register-section.active {
+      transform: translateX(0);
+    }
+
+    .form-section.login-section.register-active {
+      transform: translateX(-100%);
+    }
+
+    .form-box {
+      flex: 1;
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: #161b22;
+    }
+
+    .welcome-box {
+      flex: 1;
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: linear-gradient(135deg, #58a6ff, #7c3aed);
+      color: white;
+    }
+
+    .form-title {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: #58a6ff;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 0.8rem;
+      background: transparent;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      color: #c9d1d9;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: #58a6ff;
+    }
+
+    .input-group input:focus + label,
+    .input-group input:valid + label {
+      transform: translateY(-150%);
+      font-size: 0.8rem;
+      color: #58a6ff;
+    }
+
+    .input-group label {
+      position: absolute;
+      top: 50%;
+      left: 0.8rem;
+      transform: translateY(-50%);
+      color: #8b949e;
+      transition: all 0.3s;
+      pointer-events: none;
+    }
+
+    .forgot-password {
+      text-align: right;
+      margin-bottom: 1rem;
+    }
+
+    .forgot-password a {
+      color: #58a6ff;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .forgot-password a:hover {
+      text-decoration: underline;
+    }
+
+    .btn {
+      padding: 0.8rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn:not(.secondary) {
+      background-color: #58a6ff;
+      color: white;
+    }
+
+    .btn:not(.secondary):hover {
+      background-color: #4595ff;
+      transform: translateY(-2px);
+    }
+
+    .btn.secondary {
+      background: transparent;
+      color: white;
+      border: 2px solid white;
+    }
+
+    .btn.secondary:hover {
+      background: white;
+      color: #58a6ff;
+    }
+
+    .welcome-box h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .welcome-box p {
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .animation {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: slideUp 0.6s ease forwards;
+      animation-delay: calc(var(--i) * 0.1s);
+    }
+
+    @keyframes slideUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     @media (max-width: 768px) {
       .nav-links {
         flex-direction: column;
@@ -505,221 +643,350 @@
       .project-avatar {
         margin-bottom: 0.5rem;
       }
+
+      .forms-container {
+        margin: 1rem;
+        height: 90vh;
+      }
+
+      .form-section {
+        flex-direction: column;
+      }
+
+      .form-box, .welcome-box {
+        padding: 2rem;
+      }
     }
   </style>
+</head>
+<body>
 
-    <script>
-    // Sample projects data
-    const projects = [
-      {
-        id: 1,
-        author: "Maria Silva",
-        location: "São Paulo, SP",
-        image: "https://via.placeholder.com/400x200/58a6ff/ffffff?text=E-commerce+App",
-        description: "Aplicação de e-commerce completa com sistema de pagamento integrado, gestão de produtos e painel administrativo. Desenvolvida com React e Node.js.",
-        tags: ["React", "Node.js", "MongoDB"]
-      },
-      {
-        id: 2,
-        author: "João Santos",
-        location: "Rio de Janeiro, RJ",
-        image: "https://via.placeholder.com/400x200/7c3aed/ffffff?text=Data+Analytics",
-        description: "Dashboard interativo para análise de dados de vendas com visualizações em tempo real. Utiliza Python, Pandas e Plotly para gerar insights valiosos.",
-        tags: ["Python", "Pandas", "Plotly"]
-      },
-      {
-        id: 3,
-        author: "Ana Costa",
-        location: "Belo Horizonte, MG",
-        image: "https://via.placeholder.com/400x200/f59e0b/ffffff?text=Mobile+App",
-        description: "Aplicativo mobile para gerenciamento de tarefas com sincronização na nuvem. Interface intuitiva desenvolvida em React Native com backend em Firebase.",
-        tags: ["React Native", "Firebase", "UX/UI"]
-      },
-      {
-        id: 4,
-        author: "Carlos Oliveira",
-        location: "Porto Alegre, RS",
-        image: "https://via.placeholder.com/400x200/10b981/ffffff?text=AI+Chatbot",
-        description: "Chatbot inteligente para atendimento ao cliente usando processamento de linguagem natural. Integrado com APIs de machine learning e WebSocket.",
-        tags: ["Python", "NLP", "TensorFlow"]
-      },
-      {
-        id: 5,
-        author: "Fernanda Lima",
-        location: "Recife, PE",
-        image: "https://via.placeholder.com/400x200/ef4444/ffffff?text=Game+Dev",
-        description: "Jogo indie 2D desenvolvido em Unity com mecânicas inovadoras de puzzle. Arte pixel art original e trilha sonora composta exclusivamente para o projeto.",
-        tags: ["Unity", "C#", "Game Design"]
-      },
-      {
-        id: 6,
-        author: "Pedro Rocha",
-        location: "Salvador, BA",
-        image: "https://via.placeholder.com/400x200/8b5cf6/ffffff?text=Blockchain+DApp",
-        description: "Aplicação descentralizada para marketplace de NFTs com smart contracts seguros. Desenvolvida em Solidity com frontend em React e Web3.js.",
-        tags: ["Solidity", "Web3", "Blockchain"]
-      }
-    ];
+  <header id="navbar">
+    <div class="navbar">
+      <h1>CodePitch</h1>
+      <nav class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">Explorar Projetos</a>
+        <button class="cta-button" onclick="openAuthModal()">
+          <span class="cta-text">Entrar</span>
+          <span class="cta-icon">🚀</span>
+        </button>
+      </nav>
+    </div>
+  </header>
 
-    // Comments storage
-    let comments = {};
+  <section class="hero">
+    <h2>Bem-vindo ao CodePitch</h2>
+    <p>Conectando desenvolvedores através de projetos inovadores na tecnologia</p>
+  </section>
 
-    // Initialize projects
-    function initProjects() {
-      const grid = document.getElementById('projectsGrid');
+  <section class="carousel-container">
+    <div class="carousel-track" id="carouselTrack">
+      <div class="carousel-slide">
+        <h3>Projetos Web</h3>
+        <p>Descubra aplicações web inovadoras criadas pela comunidade.</p>
+      </div>
+      <div class="carousel-slide">
+        <h3>Apps Mobile</h3>
+        <p>Explore aplicativos móveis desenvolvidos por talentos emergentes.</p>
+      </div>
+      <div class="carousel-slide">
+        <h3>Análise de Dados</h3>
+        <p>Veja projetos de ciência de dados e machine learning.</p>
+      </div>
+    </div>
+
+    <div class="carousel-buttons">
+      <button id="prevBtn">&#10094;</button>
+      <button id="nextBtn">&#10095;</button>
+    </div>
+
+    <div class="carousel-nav">
+      <span class="nav-dot active" data-slide="0"></span>
+      <span class="nav-dot" data-slide="1"></span>
+      <span class="nav-dot" data-slide="2"></span>
+    </div>
+  </section>
+
+  <section class="projects-section">
+    <h2>Projetos em Destaque</h2>
+    <div class="projects-grid" id="projectsGrid">
+      <!-- Projects will be populated by JavaScript -->
+    </div>
+  </section>
+
+  <!-- Comments Modal -->
+  <div id="commentsModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="modalTitle">Comentários</h2>
       
-      projects.forEach(project => {
-        const projectCard = document.createElement('div');
-        projectCard.className = 'project-card';
-        projectCard.innerHTML = `
-          <div class="project-header">
-            <div class="project-avatar">
-              ${project.author.split(' ').map(n => n[0]).join('')}
-            </div>
-            <div class="project-author">
-              <h3>${project.author}</h3>
-              <div class="project-location">
-                📍 ${project.location}
+      <div class="comment-form">
+        <textarea id="commentText" placeholder="Deixe seu comentário..."></textarea>
+        <button onclick="addComment()">Enviar Comentário</button>
+      </div>
+      
+      <div class="comments-list" id="commentsList">
+        <!-- Comments will be populated here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Login/Register Popup Modal -->
+  <div id="authModal" class="auth-modal">
+    <div class="auth-container">
+      <span class="auth-close" onclick="closeAuthModal()">&times;</span>
+      
+      <div class="forms-container">
+        <!-- Login Form Section -->
+        <div class="form-section login-section active" id="loginSection">
+          <div class="form-box">
+            <h2 class="form-title animation" style="--i:1">Entrar</h2>
+            <form id="login-form">
+              <div class="input-group animation" style="--i:4">
+                <input type="email" name="email" required />
+                <label>Email</label>
               </div>
-            </div>
+              <div class="input-group animation" style="--i:5">
+                <input type="password" name="password" required />
+                <label>Senha</label>
+              </div>
+              <div class="forgot-password animation" style="--i:6">
+                <a href="#">Esqueceu sua senha?</a>
+              </div>
+              <button type="submit" class="btn animation" style="--i:7">Entrar</button>
+            </form>
           </div>
-          
-          <div class="project-image">
-            <img src="${project.image}" alt="Projeto de ${project.author}">
+          <div class="welcome-box">
+            <h2 class="animation" style="--i:1">Olá!</h2>
+            <p class="animation" style="--i:2">Registre-se com seus dados pessoais para usar todos os recursos.</p>
+            <button class="btn secondary animation" style="--i:3" onclick="showRegister()">CADASTRAR</button>
           </div>
-          
-          <div class="project-description">
-            ${project.description}
-          </div>
-          
-          <div class="project-actions">
-            <button class="comment-btn" onclick="openComments(${project.id}, '${project.author}')">
-              💬 Comentários
-            </button>
-            <div class="project-tags">
-              ${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-            </div>
-          </div>
-        `;
-        
-        grid.appendChild(projectCard);
-      });
-    }
-
-    // Comments functionality
-    function openComments(projectId, authorName) {
-      const modal = document.getElementById('commentsModal');
-      const modalTitle = document.getElementById('modalTitle');
-      modalTitle.textContent = `Comentários - Projeto de ${authorName}`;
-      modal.style.display = 'block';
-      modal.dataset.projectId = projectId;
-      
-      loadComments(projectId);
-    }
-
-    function closeModal() {
-      document.getElementById('commentsModal').style.display = 'none';
-    }
-
-    function addComment() {
-      const modal = document.getElementById('commentsModal');
-      const projectId = modal.dataset.projectId;
-      const commentText = document.getElementById('commentText').value.trim();
-      
-      if (!commentText) return;
-      
-      if (!comments[projectId]) {
-        comments[projectId] = [];
-      }
-      
-      const comment = {
-        id: Date.now(),
-        author: 'Usuário Anônimo',
-        text: commentText,
-        timestamp: new Date().toLocaleString('pt-BR')
-      };
-      
-      comments[projectId].push(comment);
-      document.getElementById('commentText').value = '';
-      loadComments(projectId);
-    }
-
-    function loadComments(projectId) {
-      const commentsList = document.getElementById('commentsList');
-      const projectComments = comments[projectId] || [];
-      
-      if (projectComments.length === 0) {
-        commentsList.innerHTML = '<p style="color: #8b949e; text-align: center;">Nenhum comentário ainda. Seja o primeiro!</p>';
-        return;
-      }
-      
-      commentsList.innerHTML = projectComments.map(comment => `
-        <div class="comment">
-          <div class="comment-author">${comment.author}</div>
-          <div>${comment.text}</div>
-          <div style="color: #8b949e; font-size: 0.8rem; margin-top: 0.5rem;">${comment.timestamp}</div>
         </div>
-      `).join('');
-    }
 
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-      const modal = document.getElementById('commentsModal');
-      if (event.target === modal) {
-        closeModal();
-      }
-    };
+        <!-- Registration Form Section -->
+        <div class="form-section register-section" id="registerSection">
+          <div class="welcome-box">
+            <h2 class="animation" style="--i:1">Bem-vindo de Volta!</h2>
+            <p class="animation" style="--i:2">Entre com seus dados pessoais para usar todos os recursos.</p>
+            <button class="btn secondary animation" style="--i:3" onclick="showLogin()">ENTRAR</button>
+          </div>
+          <div class="form-box">
+            <h2 class="form-title animation" style="--i:1">Criar Conta</h2>
+            <form id="register-form">
+              <div class="input-group animation" style="--i:4">
+                <input type="text" name="name" required />
+                <label>Nome</label>
+              </div>
+              <div class="input-group animation" style="--i:5">
+                <input type="email" name="email" required />
+                <label>Email</label>
+              </div>
+              <div class="input-group animation" style="--i:6">
+                <input type="password" name="password" required />
+                <label>Senha</label>
+              </div>
+              <button type="submit" class="btn animation" style="--i:7">CADASTRAR</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    // Carousel functionality
-    const track = document.getElementById('carouselTrack');
-    const slides = track.children;
-    const nextBtn = document.getElementById('nextBtn');
-    const prevBtn = document.getElementById('prevBtn');
-    const navDots = document.querySelectorAll('.nav-dot');
-    const navbar = document.getElementById('navbar');
-    
-    let currentSlide = 0;
-    const totalSlides = slides.length;
-    
-    function updateCarousel() {
-      track.style.transform = `translateX(-${currentSlide * 100}%)`;
-      navDots.forEach((dot, index) => {
-        dot.classList.toggle('active', index === currentSlide);
-      });
-    }
+<script>// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCs-PeIHCTX1AUqlVEOGFKQRu4sPGba1ls",
+  authDomain: "codepitch1.firebaseapp.com",
+  projectId: "codepitch1",
+  storageBucket: "codepitch1.appspot.com",
+  messagingSenderId: "393929936980",
+  appId: "1:393929936980:web:cd5b056d7add40732f1dc1"
+};
 
-    function nextSlide() {
-      currentSlide = (currentSlide + 1) % totalSlides;
-      updateCarousel();
-    }
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
-    function prevSlide() {
-      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-      updateCarousel();
-    }
+// Sample projects data
+const projects = [
+  {
+    id: 1,
+    author: "Maria Silva",
+    location: "São Paulo, SP",
+    image: "https://via.placeholder.com/400x200/58a6ff/ffffff?text=E-commerce+App",
+    description: "Aplicação de e-commerce completa com sistema de pagamento integrado, gestão de produtos e painel administrativo. Desenvolvida com React e Node.js.",
+    tags: ["React", "Node.js", "MongoDB"]
+  },
+  // ... outros projetos omitidos por brevidade
+];
 
-    nextBtn.addEventListener('click', nextSlide);
-    prevBtn.addEventListener('click', prevSlide);
+let comments = {};
 
-    navDots.forEach(dot => {
-      dot.addEventListener('click', () => {
-        currentSlide = parseInt(dot.dataset.slide);
-        updateCarousel();
-      });
+function initProjects() {
+  const grid = document.getElementById('projectsGrid');
+  projects.forEach(project => {
+    const projectCard = document.createElement('div');
+    projectCard.className = 'project-card';
+    projectCard.innerHTML = `
+      <div class="project-header">
+        <div class="project-avatar">${project.author.split(' ').map(n => n[0]).join('')}</div>
+        <div class="project-author">
+          <h3>${project.author}</h3>
+          <div class="project-location">📍 ${project.location}</div>
+        </div>
+      </div>
+      <div class="project-image">
+        <img src="${project.image}" alt="Projeto de ${project.author}">
+      </div>
+      <div class="project-description">${project.description}</div>
+      <div class="project-actions">
+        <button class="comment-btn" onclick="openComments(${project.id}, '${project.author}')">💬 Comentários</button>
+        <div class="project-tags">
+          ${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+        </div>
+      </div>`;
+    grid.appendChild(projectCard);
+  });
+}
+
+function openComments(projectId, authorName) {
+  const modal = document.getElementById('commentsModal');
+  const modalTitle = document.getElementById('modalTitle');
+  modalTitle.textContent = `Comentários - Projeto de ${authorName}`;
+  modal.style.display = 'block';
+  modal.dataset.projectId = projectId;
+  loadComments(projectId);
+}
+
+function closeModal() {
+  document.getElementById('commentsModal').style.display = 'none';
+}
+
+function addComment() {
+  const modal = document.getElementById('commentsModal');
+  const projectId = modal.dataset.projectId;
+  const commentText = document.getElementById('commentText').value.trim();
+
+  if (!commentText) return;
+  if (!comments[projectId]) comments[projectId] = [];
+
+  const user = auth.currentUser;
+  const comment = {
+    id: Date.now(),
+    author: user?.displayName || 'Usuário Anônimo',
+    text: commentText,
+    timestamp: new Date().toLocaleString('pt-BR')
+  };
+
+  comments[projectId].push(comment);
+  document.getElementById('commentText').value = '';
+  loadComments(projectId);
+}
+
+function loadComments(projectId) {
+  const commentsList = document.getElementById('commentsList');
+  const projectComments = comments[projectId] || [];
+
+  if (projectComments.length === 0) {
+    commentsList.innerHTML = '<p style="color: #8b949e; text-align: center;">Nenhum comentário ainda. Seja o primeiro!</p>';
+    return;
+  }
+
+  commentsList.innerHTML = projectComments.map(comment => `
+    <div class="comment">
+      <div class="comment-author">${comment.author}</div>
+      <div>${comment.text}</div>
+      <div style="color: #8b949e; font-size: 0.8rem; margin-top: 0.5rem;">${comment.timestamp}</div>
+    </div>`).join('');
+}
+
+function openAuthModal() {
+  document.getElementById('authModal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAuthModal() {
+  document.getElementById('authModal').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+function showRegister() {
+  document.getElementById('loginSection').classList.add('register-active');
+  document.getElementById('registerSection').classList.add('active');
+}
+
+function showLogin() {
+  document.getElementById('loginSection').classList.remove('register-active');
+  document.getElementById('registerSection').classList.remove('active');
+}
+
+document.getElementById('login-form').addEventListener('submit', function (e) {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const email = formData.get('email');
+  const password = formData.get('password');
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then(userCredential => {
+      closeAuthModal();
+      updateLoginButton();
+    })
+    .catch(error => {
+      alert('Erro no login: ' + error.message);
     });
+});
 
-    // Auto-slide every 7 seconds
-    setInterval(nextSlide, 7000);
+document.getElementById('register-form').addEventListener('submit', function (e) {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const name = formData.get('name');
+  const email = formData.get('email');
+  const password = formData.get('password');
 
-    // Navbar scroll effect
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 10) {
-        navbar.classList.add('scrolled');
-      } else {
-        navbar.classList.remove('scrolled');
-      }
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(userCredential => {
+      return userCredential.user.updateProfile({ displayName: name });
+    })
+    .then(() => {
+      alert('Cadastro realizado com sucesso! Agora faça login.');
+      showLogin();
+    })
+    .catch(error => {
+      alert('Erro no cadastro: ' + error.message);
     });
+});
 
-    // Initialize the page
-    initProjects();
-  </script>
+function updateLoginButton() {
+  const user = auth.currentUser;
+  const loginBtn = document.getElementById('loginBtn');
+  if (user && loginBtn) {
+    loginBtn.innerHTML = user.displayName || 'Usuário';
+    loginBtn.disabled = true;
+    loginBtn.classList.add('logged-in');
+  }
+}
+
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    updateLoginButton();
+  }
+});
+
+window.onclick = function (event) {
+  if (event.target === document.getElementById('commentsModal')) closeModal();
+  if (event.target === document.getElementById('authModal')) closeAuthModal();
+};
+
+document.addEventListener('keydown', function (event) {
+  if (event.key === 'Escape') {
+    closeModal();
+    closeAuthModal();
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  initProjects();
+});
+</script>
+</body>
+</html>
