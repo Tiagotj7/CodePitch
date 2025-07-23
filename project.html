@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="src/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="src/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="src/favicon-16x16.png">
+    <link rel="manifest" href="src/site.webmanifest">
+    <link rel="mask-icon" href="src/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="shortcut icon" href="src/favicon.ico">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
+
+    <!-- Boxicons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <title>Explorar Projetos</title>
+
+</head>
+
+<body>
+
+    <header id="navbar">
+        <div class="navbar">
+            <h1>CodePitch</h1>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="project.html">Explorar Projetos</a>
+                <div id="userMenuContainer">
+                    <button id="loginBtn" class="cta-button" onclick="openAuthModal()">
+                        <span class="cta-text">Entrar</span>
+                        <span class="cta-icon">🚀</span>
+                    </button>
+                    <div id="userDropdown" class="user-dropdown" style="display: none;">
+                        <button class="user-button" onclick="toggleUserMenu()">
+                            👤 <span id="userNameDisplay">Usuário</span>
+                        </button>
+                        <div id="dropdownContent" class="dropdown-content">
+                            <button onclick="logout()">Sair</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="projects-section">
+            <h2>Projetos em Destaque</h2>
+            <div class="projects-grid" id="projectsGrid">
+                <!-- Projetos serão renderizados aqui via JavaScript -->
+            </div>
+        </section>
+    </main>
+
+</body>
+
+</html>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #0d1117;
+        color: #c9d1d9;
+    }
+
+    /* Header */
+    header {
+        position: fixed;
+        width: 100%;
+        background-color: #161b22;
+        padding: 1rem 2rem;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    header.scrolled {
+        background-color: #0d1117;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .navbar h1 {
+        color: #58a6ff;
+        font-size: 1.8rem;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .nav-links a {
+        text-decoration: none;
+        color: #c9d1d9;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+        color: #58a6ff;
+    }
+
+    /* CTA Button */
+    .cta-button {
+        background-color: #58a6ff;
+        color: white !important;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        border: 1px solid #58a6ff;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .cta-button:hover {
+        background-color: #4595ff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(88, 166, 255, 0.2);
+    }
+
+    #createPostBtn {
+        background-color: #238636;
+        margin-left: 1rem;
+    }
+
+    #createPostBtn:hover {
+        background-color: #2ea043;
+    }
+
+    /* Main Content */
+    .container {
+        padding-top: 80px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 100px 2rem 2rem;
+    }
+
+    .projects-section h2 {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: #58a6ff;
+    }
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .project-card {
+        background-color: #161b22;
+        border-radius: 8px;
+        padding: 1.5rem;
+        border: 1px solid #30363d;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .project-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(88, 166, 255, 0.1);
+    }
+
+    .project-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .project-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #58a6ff, #7c3aed);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        margin-right: 1rem;
+    }
+
+    .project-image {
+        width: 100%;
+        height: 200px;
+        background-color: #21262d;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+    }
+
+    .project-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .project-description {
+        color: #c9d1d9;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+
+    .project-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .comment-btn {
+        background-color: #238636;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .comment-btn:hover {
+        background-color: #2ea043;
+    }
+
+    .project-tags {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .tag {
+        background-color: #58a6ff;
+        color: #0d1117;
+        padding: 0.2rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .user-button {
+        background-color: #238636;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background-color: #161b22;
+        min-width: 160px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        border-radius: 6px;
+        z-index: 1;
+    }
+
+    .dropdown-content button {
+        background: none;
+        border: none;
+        color: #c9d1d9;
+        padding: 12px 16px;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .dropdown-content button:hover {
+        background-color: #21262d;
+    }
+</style>
+
+
+<script>
+    // ================= CONFIGURAÇÃO DO FIREBASE ================= //
+    const firebaseConfig = {
+        apiKey: "AIzaSyCs-PeIHCTX1AUqlVEOGFKQRu4sPGba1ls",
+        authDomain: "codepitch1.firebaseapp.com",
+        projectId: "codepitch1",
+        storageBucket: "codepitch1.appspot.com",
+        messagingSenderId: "393929936980",
+        appId: "1:393929936980:web:cd5b056d7add40732f1dc1"
+    };
+
+    // Inicializa o Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // ================= VARIÁVEIS GLOBAIS ================= //
+    let currentProjectId = null;
+    let projects = [];
+
+    // ================= INICIALIZAÇÃO DA PÁGINA ================= //
+    document.addEventListener('DOMContentLoaded', () => {
+        loadPostsFromFirestore();
+        setupAuthListeners();
+    });
+
+    // ================= SISTEMA DE POSTS ================= //
+    async function loadPostsFromFirestore() {
+        try {
+            // Começa com os posts pré-definidos
+            projects = [...getFallbackProjects()];
+
+            // Tenta carregar posts do Firestore
+            const snapshot = await db.collection('projects')
+                .orderBy('createdAt', 'desc')
+                .get();
+
+            if (!snapshot.empty) {
+                // Adiciona os posts do Firestore aos posts pré-definidos
+                const firestoreProjects = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                projects = [...firestoreProjects, ...projects];
+            }
+
+            refreshProjectsGrid();
+        } catch (error) {
+            console.error("Erro ao carregar posts:", error);
+            // Fallback para apenas os posts pré-definidos em caso de erro
+            projects = [...getFallbackProjects()];
+            refreshProjectsGrid();
+        }
+    }
+
+    function refreshProjectsGrid() {
+        const grid = document.getElementById('projectsGrid');
+        grid.innerHTML = '';
+
+        const currentUser = auth.currentUser;
+
+        projects.forEach(project => {
+            const card = document.createElement('div');
+            card.className = 'project-card';
+            card.innerHTML = `
+      <div class="project-header">
+        <div class="project-avatar">${getInitials(project.author)}</div>
+        <div>
+          <h3>${project.title || project.author}</h3>
+          <div class="project-author">Por ${project.author}</div>
+          <div class="project-location">📍 ${project.location}</div>
+        </div>
+        ${currentUser && currentUser.uid === project.authorId ?
+                    `<button class="delete-post-btn" onclick="deletePost('${project.id}')">🗑️</button>` : ''}
+      </div>
+      <div class="project-image">
+        <img src="${project.image}" alt="${project.description}" onerror="this.src='https://via.placeholder.com/400x200?text=Imagem+não+disponível'">
+      </div>
+      <div class="project-description">${project.description}</div>
+      <div class="project-actions">
+        <button class="comment-btn" onclick="openComments('${project.id}', '${project.author}')">
+          💬 Comentários (${project.commentsCount || 0})
+        </button>
+        <div class="project-tags">
+          ${(project.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
+        </div>
+      </div>
+    `;
+            grid.appendChild(card);
+        });
+    }
+
+    function getInitials(name) {
+        return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    }
+
+    function getFallbackProjects() {
+        return [
+            {
+                id: "1",
+                author: "Maria Silva",
+                location: "São Paulo, SP",
+                image: "https://imgs.search.brave.com/bAM5fcnemhP2h-qykELl60oruXYNqSRqlwQZpkg-lRc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zZWph/ZWZpLmNvbS5ici9w/b3J0YWwvd3AtY29u/dGVudC91cGxvYWRz/LzIwMjQvMTAvcGFn/YW1lbnRvLW9ubGlu/ZS5wbmc",
+                description: "Plataforma de e‑commerce com carrinho, pagamento integrado e painel administrativo.",
+                tags: ["React", "Node.js", "MongoDB"],
+                commentsCount: 0
+            },
+            {
+                id: "2",
+                author: "João Santos",
+                location: "Rio de Janeiro, RJ",
+                image: "https://imgs.search.brave.com/ZYaopMwrlahUA2MEowLQU9wQz9YvvYIT8pzgRgjQcA4/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9naXRo/dWIuY29tL3Bsb3Rs/eS9kYXNoLXNhbXBs/ZS1hcHBzL3Jhdy9t/YWluL2FwcHMvZGFz/aC1tYW51ZmFjdHVy/ZS1zcGMtZGFzaGJv/YXJkL2ltZy9zY3Jl/ZW5jYXB0dXJlMS5w/bmc",
+                description: "Dashboard interativo para análise de vendas em tempo real usando Python e Plotly.",
+                tags: ["Python", "Pandas", "Plotly"],
+                commentsCount: 0
+            },
+            {
+                id: "3",
+                author: "Ana Costa",
+                location: "Belo Horizonte, MG",
+                image: "https://images.unsplash.com/photo-1558655146-d09347e92766?fit=crop&w=800&q=80",
+                description: "App mobile de gerenciamento de tarefas com autenticação e sincronização via Firebase.",
+                tags: ["React Native", "Firebase", "UX/UI"],
+                commentsCount: 0
+            },
+            {
+                id: "4",
+                author: "Carlos Oliveira",
+                location: "Porto Alegre, RS",
+                image: "https://imgs.search.brave.com/xprXZhFBhAyjI8d_cBhn08JqyqTSNn1QmMS-xko3BuA/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly93cC5z/ZmRjZGlnaXRhbC5j/b20vcHQtYnIvd3At/Y29udGVudC91cGxv/YWRzL3NpdGVzLzE1/LzIwMjMvMDUvcHJv/ZHVjdC1mZWF0dXJl/cy1laW5zdGVpbi1i/b3RzLWFwaS0xLmpw/Zz93PTEwMjQ",
+                description: "Chatbot para atendimento ao cliente, usando NLP e TensorFlow com WebSocket.",
+                tags: ["Python", "NLP", "TensorFlow"],
+                commentsCount: 0
+            },
+            {
+                id: "5",
+                author: "Fernanda Lima",
+                location: "Recife, PE",
+                image: "https://imgs.search.brave.com/vVaQIgzDrB9kOEaii4yPOFhUwbOoSq4Lb5i6gkmjAMc/rs:fit:860:0:0:0/g:ce/aHR0cDovL3d3dy5n/YW1lcmluZm8uY29t/LmJyL3dwLWNvbnRl/bnQvdXBsb2Fkcy8y/MDIwLzAxL2pvZ29z/LWVtLXBpeGVsLWFy/dC1wYXJhLXBjLXN0/YXJkZXctdmFsbGV5/LmpwZw",
+                description: "Jogo 2D indie em Unity com mecânicas de puzzle e arte pixel art.",
+                tags: ["Unity", "C#", "Game Design"],
+                commentsCount: 0
+            },
+            {
+                id: "6",
+                author: "Pedro Rocha",
+                location: "Salvador, BA",
+                image: "https://imgs.search.brave.com/T2DX3mBYNR8AizVXcpq-lAxL27gy0cXSJlqWvuC3lWA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9maXJl/YmFzZS5nb29nbGUu/Y29tL3N0YXRpYy9p/bWFnZXMvcHJvZHVj/dHMvcmVhbHRpbWUt/ZGF0YWJhc2UvZGF0/YWJhc2UtMi5wbmc_/aGw9cHQtYnI",
+                description: "DApp para marketplace de NFTs com smart contracts em Solidity e Web3.js.",
+                tags: ["Solidity", "Web3.js", "Blockchain"],
+                commentsCount: 0
+            }
+        ];
+    }
+
+    // ================= SISTEMA DE COMENTÁRIOS ================= //
+    async function openComments(projectId, author) {
+        currentProjectId = projectId;
+        const modal = document.getElementById('commentsModal');
+        document.getElementById('modalTitle').textContent = `Comentários - ${author}`;
+        modal.style.display = 'block';
+        await loadComments(projectId);
+    }
+
+    async function loadComments(projectId) {
+        const commentsList = document.getElementById('commentsList');
+        commentsList.innerHTML = '<p class="loading-comments">Carregando comentários...</p>';
+
+        try {
+            const snapshot = await db.collection('comments')
+                .where('projectId', '==', projectId)
+                .orderBy('timestamp', 'desc')
+                .get();
+
+            if (snapshot.empty) {
+                commentsList.innerHTML = '<p class="no-comments">Nenhum comentário ainda. Seja o primeiro!</p>';
+                return;
+            }
+
+            commentsList.innerHTML = '';
+            const currentUser = auth.currentUser;
+
+            snapshot.forEach(doc => {
+                const comment = doc.data();
+                const date = comment.timestamp?.toDate().toLocaleString('pt-BR') || 'Agora';
+
+                const commentElement = document.createElement('div');
+                commentElement.className = 'comment';
+                commentElement.innerHTML = `
+        <div class="comment-header">
+          <span class="comment-author">${comment.authorName}</span>
+          ${currentUser?.uid === comment.authorId ?
+                        `<button class="delete-comment-btn" onclick="deleteComment('${doc.id}')">🗑️</button>` : ''}
+        </div>
+        <p class="comment-text">${comment.text}</p>
+        <small class="comment-date">${date}</small>
+      `;
+                commentsList.appendChild(commentElement);
+            });
+
+        } catch (error) {
+            console.error("Erro ao carregar comentários:", error);
+            commentsList.innerHTML = '<p class="error-comments">Erro ao carregar comentários. Recarregue a página.</p>';
+        }
+    }
+
+    // ================= AUTENTICAÇÃO ================= //
+    function setupAuthListeners() {
+        auth.onAuthStateChanged(user => {
+            updateUI(user);
+        });
+    }
+
+    function updateUI(user) {
+        const loginBtn = document.getElementById('loginBtn');
+        const userDropdown = document.getElementById('userDropdown');
+
+        if (user) {
+            loginBtn.style.display = 'none';
+            userDropdown.style.display = 'block';
+            document.getElementById('userNameDisplay').textContent = user.displayName || user.email.split('@')[0];
+        } else {
+            loginBtn.style.display = 'flex';
+            userDropdown.style.display = 'none';
+        }
+    }
+
+    function logout() {
+        auth.signOut();
+    }
+
+    function toggleUserMenu() {
+        const dropdown = document.getElementById('dropdownContent');
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // ================= EVENTOS GLOBAIS ================= //
+    window.addEventListener('click', (e) => {
+        if (!e.target.closest('.user-dropdown')) {
+            document.getElementById('dropdownContent').style.display = 'none';
+        }
+    });
+</script>
