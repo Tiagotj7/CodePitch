@@ -195,70 +195,86 @@ async function deleteProject(projectId) {
 
 // ================= EDIÇÃO DE POSTS ================= //
 function setupEditPost() {
-  const editForm = document.getElementById('editPostForm');
+  // Aguarda o DOM estar pronto e configura o listener
+  setTimeout(() => {
+    const editForm = document.getElementById('editPostForm');
+    if (editForm) {
+      // Remove listener anterior se existir
+      editForm.removeEventListener('submit', handleEditSubmit);
+      // Adiciona o novo listener
+      editForm.addEventListener('submit', handleEditSubmit);
+    }
+  }, 100);
+}
+
+// Função separada para o handler do submit
+function handleEditSubmit(e) {
+  e.preventDefault();
+  saveEditedPost();
+}
+
+async function saveEditedPost() {
+  const user = auth.currentUser;
+  if (!user) {
+    alert('Você precisa estar logado para editar projetos!');
+    return;
+  }
   
-  editForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const user = auth.currentUser;
-    if (!user) {
-      alert('Você precisa estar logado para editar projetos!');
+  const projectId = document.getElementById('editProjectId').value;
+  const title = document.getElementById('editPostTitle').value.trim();
+  const location = document.getElementById('editPostLocation').value.trim();
+  const image = document.getElementById('editPostImage').value.trim();
+  const description = document.getElementById('editPostDescription').value.trim();
+  const tags = document.getElementById('editPostTags').value.split(',').map(t => t.trim()).filter(t => t);
+  
+  // Validação básica
+  if (!projectId || !title || !location || !image || !description || tags.length === 0) {
+    alert('Preencha todos os campos corretamente!');
+    return;
+  }
+  
+  try {
+    // Verifica se o usuário é o autor
+    const projectDoc = await db.collection('projects').doc(projectId).get();
+    if (projectDoc.exists && projectDoc.data().authorId !== user.uid) {
+      alert('Você não tem permissão para editar este projeto!');
       return;
     }
     
-    const projectId = document.getElementById('editProjectId').value;
-    const title = document.getElementById('editPostTitle').value.trim();
-    const location = document.getElementById('editPostLocation').value.trim();
-    const image = document.getElementById('editPostImage').value.trim();
-    const description = document.getElementById('editPostDescription').value.trim();
-    const tags = document.getElementById('editPostTags').value.split(',').map(t => t.trim()).filter(t => t);
+    // Atualiza no Firestore
+    await db.collection('projects').doc(projectId).update({
+      title,
+      location,
+      image,
+      description,
+      tags,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
     
-    // Validação básica
-    if (!projectId || !title || !location || !image || !description || tags.length === 0) {
-      alert('Preencha todos os campos corretamente!');
-      return;
-    }
-    
-    try {
-      // Verifica se o usuário é o autor
-      const projectDoc = await db.collection('projects').doc(projectId).get();
-      if (projectDoc.exists && projectDoc.data().authorId !== user.uid) {
-        alert('Você não tem permissão para editar este projeto!');
-        return;
-      }
-      
-      // Atualiza no Firestore
-      await db.collection('projects').doc(projectId).update({
+    // Atualiza localmente
+    const projectIndex = projects.findIndex(p => p.id === projectId);
+    if (projectIndex !== -1) {
+      projects[projectIndex] = {
+        ...projects[projectIndex],
         title,
         location,
         image,
         description,
-        tags,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      
-      // Atualiza localmente
-      const projectIndex = projects.findIndex(p => p.id === projectId);
-      if (projectIndex !== -1) {
-        projects[projectIndex] = {
-          ...projects[projectIndex],
-          title,
-          location,
-          image,
-          description,
-          tags
-        };
-      }
-      
-      renderProjects();
-      closeEditPostModal();
-      alert('Projeto atualizado com sucesso!');
-      
-    } catch (error) {
-      console.error("Erro ao atualizar projeto:", error);
-      alert('Erro ao atualizar projeto. Tente novamente.');
+        tags
+      };
     }
-  });
+    
+    // Re-renderiza os projetos
+    renderProjects();
+    
+    // Fecha o modal
+    closeEditPostModal();
+    alert('Projeto atualizado com sucesso!');
+    
+  } catch (error) {
+    console.error("Erro ao atualizar projeto:", error);
+    alert('Erro ao atualizar projeto. Tente novamente.');
+  }
 }
 
 function openEditModal(projectId) {
@@ -484,60 +500,62 @@ function toggleUserMenu() {
 // ================= CRIAÇÃO DE POSTS ================= //
 function setupCreatePost() {
   const postForm = document.getElementById('postForm');
-  postForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const user = auth.currentUser;
-    if (!user) {
-      alert('Você precisa estar logado para criar um post!');
-      return;
-    }
+  if (postForm) {
+    postForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const user = auth.currentUser;
+      if (!user) {
+        alert('Você precisa estar logado para criar um post!');
+        return;
+      }
 
-    const title = document.getElementById('postTitle').value.trim();
-    const location = document.getElementById('postLocation').value.trim();
-    const image = document.getElementById('postImage').value.trim();
-    const description = document.getElementById('postDescription').value.trim();
-    const tags = document.getElementById('postTags').value.split(',').map(t => t.trim()).filter(t => t);
-    
-    if (!title || !location || !image || !description || tags.length === 0) {
-      alert('Preencha todos os campos corretamente!');
-      return;
-    }
-    
-    try {
-      const docRef = await db.collection('projects').add({
-        title: title,
-        author: user.displayName || user.email.split('@')[0],
-        authorId: user.uid,
-        location: location,
-        image: image,
-        description: description,
-        tags: tags,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      const title = document.getElementById('postTitle').value.trim();
+      const location = document.getElementById('postLocation').value.trim();
+      const image = document.getElementById('postImage').value.trim();
+      const description = document.getElementById('postDescription').value.trim();
+      const tags = document.getElementById('postTags').value.split(',').map(t => t.trim()).filter(t => t);
       
-      // Adiciona ao array local
-      projects.unshift({
-        id: docRef.id,
-        title: title,
-        author: user.displayName || user.email.split('@')[0],
-        authorId: user.uid,
-        location: location,
-        image: image,
-        description: description,
-        tags: tags,
-        createdAt: new Date().toISOString()
-      });
+      if (!title || !location || !image || !description || tags.length === 0) {
+        alert('Preencha todos os campos corretamente!');
+        return;
+      }
       
-      renderProjects();
-      postForm.reset();
-      closeCreatePostModal();
-      
-    } catch (error) {
-      console.error('Erro ao criar projeto:', error);
-      alert('Erro ao criar projeto. Tente novamente.');
-    }
-  });
+      try {
+        const docRef = await db.collection('projects').add({
+          title: title,
+          author: user.displayName || user.email.split('@')[0],
+          authorId: user.uid,
+          location: location,
+          image: image,
+          description: description,
+          tags: tags,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Adiciona ao array local
+        projects.unshift({
+          id: docRef.id,
+          title: title,
+          author: user.displayName || user.email.split('@')[0],
+          authorId: user.uid,
+          location: location,
+          image: image,
+          description: description,
+          tags: tags,
+          createdAt: new Date().toISOString()
+        });
+        
+        renderProjects();
+        postForm.reset();
+        closeCreatePostModal();
+        
+      } catch (error) {
+        console.error('Erro ao criar projeto:', error);
+        alert('Erro ao criar projeto. Tente novamente.');
+      }
+    });
+  }
 }
 
 function openCreatePostModal() {
@@ -666,3 +684,4 @@ window.deleteProject = deleteProject;
 window.openEditModal = openEditModal;
 window.toggleProjectMenu = toggleProjectMenu;
 window.closeEditPostModal = closeEditPostModal;
+window.saveEditedPost = saveEditedPost;
