@@ -13,114 +13,157 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// ================= DADOS DOS PROJETOS ================= //
-const projects = [
-  {
-    id: 1,
-    author: "Maria Silva",
-    location: "São Paulo, SP",
-    image: "https://imgs.search.brave.com/bAM5fcnemhP2h-qykELl60oruXYNqSRqlwQZpkg-lRc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zZWph/ZWZpLmNvbS5ici9w/b3J0YWwvd3AtY29u/dGVudC91cGxvYWRz/LzIwMjQvMTAvcGFn/YW1lbnRvLW9ubGlu/ZS5wbmc",
-    description: "Plataforma de e‑commerce com carrinho, pagamento integrado e painel administrativo.",
-    tags: ["React", "Node.js", "MongoDB"]
-  },
-      {
-      id: 2,
-      author: "João Santos",
-      location: "Rio de Janeiro, RJ",
-      image: "https://imgs.search.brave.com/ZYaopMwrlahUA2MEowLQU9wQz9YvvYIT8pzgRgjQcA4/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9naXRo/dWIuY29tL3Bsb3Rs/eS9kYXNoLXNhbXBs/ZS1hcHBzL3Jhdy9t/YWluL2FwcHMvZGFz/aC1tYW51ZmFjdHVy/ZS1zcGMtZGFzaGJv/YXJkL2ltZy9zY3Jl/ZW5jYXB0dXJlMS5w/bmc",
-      description: "Dashboard interativo para análise de vendas em tempo real usando Python e Plotly.",
-      tags: ["Python", "Pandas", "Plotly"]
-    },
-    {
-      id: 3,
-      author: "Ana Costa",
-      location: "Belo Horizonte, MG",
-      image: "https://images.unsplash.com/photo-1558655146-d09347e92766?fit=crop&w=800&q=80",
-      description: "App mobile de gerenciamento de tarefas com autenticação e sincronização via Firebase.",
-      tags: ["React Native", "Firebase", "UX/UI"]
-    },
-    {
-      id: 4,
-      author: "Carlos Oliveira",
-      location: "Porto Alegre, RS",
-      image: "https://imgs.search.brave.com/xprXZhFBhAyjI8d_cBhn08JqyqTSNn1QmMS-xko3BuA/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly93cC5z/ZmRjZGlnaXRhbC5j/b20vcHQtYnIvd3At/Y29udGVudC91cGxv/YWRzL3NpdGVzLzE1/LzIwMjMvMDUvcHJv/ZHVjdC1mZWF0dXJl/cy1laW5zdGVpbi1i/b3RzLWFwaS0xLmpw/Zz93PTEwMjQ",
-      description: "Chatbot para atendimento ao cliente, usando NLP e TensorFlow com WebSocket.",
-      tags: ["Python", "NLP", "TensorFlow"]
-    },
-    {
-      id: 5,
-      author: "Fernanda Lima",
-      location: "Recife, PE",
-      image: "https://imgs.search.brave.com/vVaQIgzDrB9kOEaii4yPOFhUwbOoSq4Lb5i6gkmjAMc/rs:fit:860:0:0:0/g:ce/aHR0cDovL3d3dy5n/YW1lcmluZm8uY29t/LmJyL3dwLWNvbnRl/bnQvdXBsb2Fkcy8y/MDIwLzAxL2pvZ29z/LWVtLXBpeGVsLWFy/dC1wYXJhLXBjLXN0/YXJkZXctdmFsbGV5/LmpwZw",
-      description: "Jogo 2D indie em Unity com mecânicas de puzzle e arte pixel art.",
-      tags: ["Unity", "C#", "Game Design"]
-    },
-    {
-      id: 6,
-      author: "Pedro Rocha",
-      location: "Salvador, BA",
-      image: "https://imgs.search.brave.com/T2DX3mBYNR8AizVXcpq-lAxL27gy0cXSJlqWvuC3lWA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9maXJl/YmFzZS5nb29nbGUu/Y29tL3N0YXRpYy9p/bWFnZXMvcHJvZHVj/dHMvcmVhbHRpbWUt/ZGF0YWJhc2UvZGF0/YWJhc2UtMi5wbmc_/aGw9cHQtYnI",
-      description: "DApp para marketplace de NFTs com smart contracts em Solidity e Web3.js.",
-      tags: ["Solidity", "Web3.js", "Blockchain"]
-    }
-];
+// ================= VARIÁVEIS GLOBAIS ================= //
+let projects = [];
+let currentProjectId = null;
 
 // ================= INICIALIZAÇÃO DA PÁGINA ================= //
 document.addEventListener('DOMContentLoaded', () => {
   initProjects();
   initCarousel();
   setupAuthListeners();
+  setupCreatePost();
+  setupEditPost();
 });
 
 // ================= SISTEMA DE PROJETOS ================= //
-function initProjects() {
+async function initProjects() {
   const grid = document.getElementById('projectsGrid');
+  grid.innerHTML = '<p class="loading">Carregando projetos...</p>';
+  
+  try {
+    const snapshot = await db.collection('projects')
+      .orderBy('createdAt', 'desc')
+      .get();
+    
+    projects = [];
+    snapshot.forEach(doc => {
+      const projectData = doc.data();
+      projects.push({
+        id: doc.id,
+        ...projectData,
+        // Garante que o nome do autor está presente
+        author: projectData.author || "Autor desconhecido"
+      });
+    });
+    
+    renderProjects();
+    
+  } catch (error) {
+    console.error("Erro ao carregar projetos:", error);
+    grid.innerHTML = '<p class="error">Erro ao carregar projetos. Tente recarregar a página.</p>';
+  }
+}
+
+function renderProjects() {
+  const grid = document.getElementById('projectsGrid');
+  grid.innerHTML = '';
+  
   projects.forEach(project => {
     const card = document.createElement('div');
     card.className = 'project-card';
+    
+    const currentUser = auth.currentUser;
+    const isAuthor = currentUser && currentUser.uid === project.authorId;
+    const createdAt = project.createdAt?.toDate ? project.createdAt.toDate() : new Date(project.createdAt);
+    
     card.innerHTML = `
       <div class="project-header">
-        <div class="project-avatar">${project.author.split(' ').map(n => n[0]).join('')}</div>
+        <div class="project-avatar">${getInitials(project.author)}</div>
         <div>
-          <h3>${project.author}</h3>
+          <h3>${project.title || "Projeto sem título"}</h3>
+          <div class="project-author">Por ${project.author}</div>
           <div class="project-location">📍 ${project.location}</div>
         </div>
+        ${isAuthor ? `
+          <div class="project-actions-menu">
+            <button class="menu-btn" onclick="toggleProjectMenu(this)">⋮</button>
+            <div class="menu-options">
+              <button onclick="deleteProject('${project.id}')">Excluir</button>
+              <button onclick="openEditModal('${project.id}')">Editar</button>
+            </div>
+          </div>
+        ` : ''}
       </div>
       <div class="project-image">
-        <img src="${project.image}" alt="${project.description}">
+        <img src="${project.image}" alt="${project.description}" onerror="this.src='https://via.placeholder.com/400x200?text=Imagem+não+disponível'">
       </div>
       <div class="project-description">${project.description}</div>
       <div class="project-actions">
-        <button class="comment-btn" onclick="openComments(${project.id}, '${project.author}')">
+        <button class="comment-btn" onclick="openComments('${project.id}', '${project.author}')">
           💬 Comentários
         </button>
         <div class="project-tags">
           ${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
         </div>
       </div>
+      <div class="project-date">
+        Postado em ${createdAt.toLocaleDateString('pt-BR')} às ${createdAt.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}
+      </div>
     `;
     grid.appendChild(card);
   });
 }
 
-// ================= SISTEMA DE COMENTÁRIOS ================= //
-let currentProjectId = null;
+function getInitials(name) {
+  return name.split(' ').map(n => n[0]).join('').toUpperCase();
+}
 
-function openComments(projectId, author) {
+// ================= FUNÇÕES DE GERENCIAMENTO DE PROJETOS ================= //
+function toggleProjectMenu(button) {
+  const menuOptions = button.nextElementSibling;
+  menuOptions.style.display = menuOptions.style.display === 'block' ? 'none' : 'block';
+}
+
+async function deleteProject(projectId) {
+  if (!confirm('Tem certeza que deseja excluir este projeto permanentemente?')) {
+    return;
+  }
+
+  try {
+    await db.collection('projects').doc(projectId).delete();
+    
+    // Remove do array local
+    projects = projects.filter(project => project.id !== projectId);
+    renderProjects();
+    
+    alert('Projeto excluído com sucesso!');
+  } catch (error) {
+    console.error("Erro ao excluir projeto:", error);
+    alert('Erro ao excluir projeto. Tente novamente.');
+  }
+}
+
+function openEditModal(projectId) {
+  const project = projects.find(p => p.id === projectId);
+  if (!project) return;
+
+  document.getElementById('editPostTitle').value = project.title || '';
+  document.getElementById('editPostLocation').value = project.location;
+  document.getElementById('editPostImage').value = project.image;
+  document.getElementById('editPostDescription').value = project.description;
+  document.getElementById('editPostTags').value = project.tags.join(', ');
+  document.getElementById('editProjectId').value = projectId;
+  
+  document.getElementById('editPostModal').style.display = 'block';
+}
+
+// ================= SISTEMA DE COMENTÁRIOS ================= //
+async function openComments(projectId, author) {
   currentProjectId = projectId;
   const modal = document.getElementById('commentsModal');
   document.getElementById('modalTitle').textContent = `Comentários - ${author}`;
   modal.style.display = 'block';
-  loadComments(projectId);
+  await loadComments(projectId);
 }
 
 async function loadComments(projectId) {
   const commentsList = document.getElementById('commentsList');
-  commentsList.innerHTML = '<p class="loading">Carregando comentários...</p>';
+  commentsList.innerHTML = '<p class="loading-comments">Carregando comentários...</p>';
 
   try {
     const snapshot = await db.collection('comments')
-      .where('projectId', '==', parseInt(projectId))
+      .where('projectId', '==', projectId)
       .orderBy('timestamp', 'desc')
       .get();
 
@@ -150,7 +193,7 @@ async function loadComments(projectId) {
     });
   } catch (error) {
     console.error("Erro ao carregar comentários:", error);
-    commentsList.innerHTML = '<p class="error">Erro ao carregar comentários.</p>';
+    commentsList.innerHTML = '<p class="error-comments">Erro ao carregar comentários.</p>';
   }
 }
 
@@ -170,7 +213,7 @@ async function addComment() {
 
   try {
     await db.collection('comments').add({
-      projectId: parseInt(currentProjectId),
+      projectId: currentProjectId,
       authorId: user.uid,
       authorName: user.displayName || user.email.split('@')[0],
       text: text,
@@ -203,12 +246,11 @@ function closeModal() {
 
 // ================= AUTENTICAÇÃO ================= //
 function setupAuthListeners() {
-  // Listener de estado de autenticação
   auth.onAuthStateChanged(user => {
     updateLoginButton(user);
+    renderProjects();
   });
 
-  // Login
   document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = e.target.email.value;
@@ -222,7 +264,6 @@ function setupAuthListeners() {
     }
   });
 
-  // Cadastro
   document.getElementById('register-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = e.target.name.value;
@@ -243,20 +284,26 @@ function setupAuthListeners() {
 function updateLoginButton(user) {
   const loginBtn = document.getElementById('loginBtn');
   const userDropdown = document.getElementById('userDropdown');
+  const createPostBtn = document.getElementById('createPostBtn');
   
   if (user) {
     loginBtn.style.display = 'none';
     userDropdown.style.display = 'block';
+    createPostBtn.style.display = 'block';
     document.getElementById('userNameDisplay').textContent = user.displayName || user.email.split('@')[0];
   } else {
     loginBtn.style.display = 'block';
     userDropdown.style.display = 'none';
+    createPostBtn.style.display = 'none';
   }
 }
 
 function logout() {
   auth.signOut().then(() => {
-    closeModal(); // Fecha o modal de comentários se estiver aberto
+    closeModal();
+    closeAuthModal();
+    closeCreatePostModal();
+    document.getElementById('dropdownContent').style.display = 'none';
   }).catch(error => {
     console.error("Erro ao fazer logout:", error);
   });
@@ -265,6 +312,119 @@ function logout() {
 function toggleUserMenu() {
   const dropdown = document.getElementById('dropdownContent');
   dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+}
+
+// ================= CRIAÇÃO DE POSTS ================= //
+function setupCreatePost() {
+  const postForm = document.getElementById('postForm');
+  postForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) {
+      alert('Você precisa estar logado para criar um post!');
+      return;
+    }
+
+    const title = document.getElementById('postTitle').value.trim();
+    const location = document.getElementById('postLocation').value.trim();
+    const image = document.getElementById('postImage').value.trim();
+    const description = document.getElementById('postDescription').value.trim();
+    const tags = document.getElementById('postTags').value.split(',').map(t => t.trim()).filter(t => t);
+    
+    if (!title || !location || !image || !description || tags.length === 0) {
+      alert('Preencha todos os campos corretamente!');
+      return;
+    }
+    
+    try {
+      const docRef = await db.collection('projects').add({
+        title: title,
+        author: user.displayName || user.email.split('@')[0],
+        authorId: user.uid,
+        location: location,
+        image: image,
+        description: description,
+        tags: tags,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      // Adiciona ao array local com o ID do Firestore
+      projects.unshift({
+        id: docRef.id,
+        title: title,
+        author: user.displayName || user.email.split('@')[0],
+        authorId: user.uid,
+        location: location,
+        image: image,
+        description: description,
+        tags: tags,
+        createdAt: new Date().toISOString()
+      });
+      
+      renderProjects();
+      postForm.reset();
+      closeCreatePostModal();
+      
+    } catch (error) {
+      console.error('Erro ao criar projeto:', error);
+      alert('Erro ao criar projeto. Tente novamente.');
+    }
+  });
+}
+
+// ================= EDIÇÃO DE POSTS ================= //
+function setupEditPost() {
+  const editForm = document.getElementById('editPostForm');
+  editForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const projectId = document.getElementById('editProjectId').value;
+    const title = document.getElementById('editPostTitle').value.trim();
+    const location = document.getElementById('editPostLocation').value.trim();
+    const image = document.getElementById('editPostImage').value.trim();
+    const description = document.getElementById('editPostDescription').value.trim();
+    const tags = document.getElementById('editPostTags').value.split(',').map(t => t.trim()).filter(t => t);
+    
+    if (!projectId || !title || !location || !image || !description || tags.length === 0) {
+      alert('Preencha todos os campos corretamente!');
+      return;
+    }
+    
+    try {
+      await db.collection('projects').doc(projectId).update({
+        title: title,
+        location: location,
+        image: image,
+        description: description,
+        tags: tags,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      // Atualiza o array local
+      const projectIndex = projects.findIndex(p => p.id === projectId);
+      if (projectIndex !== -1) {
+        projects[projectIndex] = {
+          ...projects[projectIndex],
+          title: title,
+          location: location,
+          image: image,
+          description: description,
+          tags: tags
+        };
+      }
+      
+      renderProjects();
+      closeEditPostModal();
+      
+    } catch (error) {
+      console.error('Erro ao atualizar projeto:', error);
+      alert('Erro ao atualizar projeto. Tente novamente.');
+    }
+  });
+}
+
+function closeEditPostModal() {
+  document.getElementById('editPostModal').style.display = 'none';
 }
 
 // ================= MODAIS ================= //
@@ -288,6 +448,21 @@ function showLogin() {
   document.getElementById('registerSection').classList.remove('active');
 }
 
+function openCreatePostModal() {
+  if (!auth.currentUser) {
+    alert('Você precisa estar logado para criar um post!');
+    openAuthModal();
+    return;
+  }
+  document.getElementById('createPostModal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCreatePostModal() {
+  document.getElementById('createPostModal').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
 // ================= CARROSSEL ================= //
 function initCarousel() {
   const track = document.getElementById('carouselTrack');
@@ -295,7 +470,6 @@ function initCarousel() {
   const dots = Array.from(document.querySelectorAll('.nav-dot'));
   let currentIndex = 0;
 
-  // Atualiza a posição do carrossel
   function updateCarousel() {
     track.style.transform = `translateX(-${currentIndex * 100}%)`;
     dots.forEach((dot, index) => {
@@ -303,7 +477,6 @@ function initCarousel() {
     });
   }
 
-  // Botões de navegação
   document.getElementById('nextBtn').addEventListener('click', () => {
     currentIndex = (currentIndex + 1) % slides.length;
     updateCarousel();
@@ -314,7 +487,6 @@ function initCarousel() {
     updateCarousel();
   });
 
-  // Navegação por dots
   dots.forEach((dot, index) => {
     dot.addEventListener('click', () => {
       currentIndex = index;
@@ -322,7 +494,6 @@ function initCarousel() {
     });
   });
 
-  // Auto-play (opcional)
   setInterval(() => {
     currentIndex = (currentIndex + 1) % slides.length;
     updateCarousel();
@@ -330,19 +501,45 @@ function initCarousel() {
 }
 
 // ================= EVENTOS GLOBAIS ================= //
-// Fecha modais ao clicar fora
 window.addEventListener('click', (e) => {
   if (e.target === document.getElementById('commentsModal')) closeModal();
   if (e.target === document.getElementById('authModal')) closeAuthModal();
+  if (e.target === document.getElementById('createPostModal')) closeCreatePostModal();
+  if (e.target === document.getElementById('editPostModal')) closeEditPostModal();
   if (!e.target.closest('.user-dropdown')) {
     document.getElementById('dropdownContent').style.display = 'none';
   }
+  
+  document.querySelectorAll('.menu-options').forEach(menu => {
+    if (!e.target.closest('.project-actions-menu')) {
+      menu.style.display = 'none';
+    }
+  });
 });
 
-// Fecha modais com ESC
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     closeModal();
     closeAuthModal();
+    closeCreatePostModal();
+    closeEditPostModal();
   }
 });
+
+// ================= FUNÇÕES GLOBAIS ================= //
+window.openComments = openComments;
+window.addComment = addComment;
+window.deleteComment = deleteComment;
+window.closeModal = closeModal;
+window.openAuthModal = openAuthModal;
+window.closeAuthModal = closeAuthModal;
+window.showRegister = showRegister;
+window.showLogin = showLogin;
+window.logout = logout;
+window.toggleUserMenu = toggleUserMenu;
+window.openCreatePostModal = openCreatePostModal;
+window.closeCreatePostModal = closeCreatePostModal;
+window.deleteProject = deleteProject;
+window.openEditModal = openEditModal;
+window.toggleProjectMenu = toggleProjectMenu;
+window.closeEditPostModal = closeEditPostModal;

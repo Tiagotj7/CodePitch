@@ -1,26 +1,25 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CodePitch</title>
 
-      <link rel="apple-touch-icon" sizes="180x180" href="src/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="src/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="src/favicon-16x16.png">
-    <link rel="manifest" href="src/site.webmanifest">
-    <link rel="mask-icon" href="src/safari-pinned-tab.svg" color="#5bbad5">
-    <link rel="shortcut icon" href="src/favicon.ico">
-    <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="msapplication-config" content="/browserconfig.xml">
-    <meta name="theme-color" content="#ffffff">
+  <link rel="apple-touch-icon" sizes="180x180" href="src/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="src/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="src/favicon-16x16.png">
+  <link rel="manifest" href="src/site.webmanifest">
+  <link rel="mask-icon" href="src/safari-pinned-tab.svg" color="#5bbad5">
+  <link rel="shortcut icon" href="src/favicon.ico">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="msapplication-config" content="/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth-compat.js"></script>
-
   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
-
 
   <!-- Boxicons -->
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
@@ -28,8 +27,8 @@
   <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
 
+<body>
   <header id="navbar">
     <div class="navbar">
       <h1>CodePitch</h1>
@@ -37,6 +36,10 @@
         <a href="index.html">Home</a>
         <a href="project.html">Explorar Projetos</a>
         <div id="userMenuContainer">
+          <button id="createPostBtn" class="cta-button" onclick="openCreatePostModal()">
+            <span class="cta-text">Criar Post</span>
+            <span class="cta-icon">✏️</span>
+          </button>
           <button id="loginBtn" class="cta-button" onclick="openAuthModal()">
             <span class="cta-text">Entrar</span>
             <span class="cta-icon">🚀</span>
@@ -105,6 +108,37 @@
     </div>
   </div>
 
+  <!-- Modal de Criar Post -->
+  <div id="createPostModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeCreatePostModal()">&times;</span>
+      <h2>Criar Novo Post</h2>
+      <form id="postForm">
+        <div class="input-group">
+          <input type="text" id="postTitle" placeholder=" " required>
+          <label>Título do Projeto</label>
+        </div>
+        <div class="input-group">
+          <input type="text" id="postLocation" placeholder=" " required>
+          <label>Localização (ex: São Paulo, SP)</label>
+        </div>
+        <div class="input-group">
+          <input type="url" id="postImage" placeholder=" " required>
+          <label>URL da Imagem</label>
+        </div>
+        <div class="input-group">
+          <textarea id="postDescription" placeholder=" " required></textarea>
+          <label>Descrição do Projeto</label>
+        </div>
+        <div class="input-group">
+          <input type="text" id="postTags" placeholder=" " required>
+          <label>Tags (separadas por vírgula)</label>
+        </div>
+        <button type="submit" class="btn">Publicar Projeto</button>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal de Login/Cadastro -->
   <div id="authModal" class="auth-modal">
     <div class="auth-container">
@@ -115,7 +149,7 @@
             <h2 class="form-title animation" style="--i:1">Entrar</h2>
             <form id="login-form">
               <div class="input-group animation" style="--i:4">
-                <input type="email" name="email"  required />
+                <input type="email" name="email" required />
                 <label>Email</label>
               </div>
               <div class="input-group animation" style="--i:5">
@@ -168,7 +202,6 @@
             </form>
           </div>
         </div>
-
       </div>
     </div>
   </div>

@@ -483,6 +483,10 @@ header.scrolled {
   color: #58a6ff;
 }
 
+.input-group textarea{
+  background-color: #161b22;
+}
+
 /* Buttons */
 .btn {
   padding: 1rem 2rem;
