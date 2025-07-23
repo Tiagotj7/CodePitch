@@ -109,35 +109,37 @@
   </div>
 
   <!-- Modal de Criar Post -->
-  <div id="createPostModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeCreatePostModal()">&times;</span>
-      <h2>Criar Novo Post</h2>
-      <form id="postForm">
-        <div class="input-group">
-          <input type="text" id="postTitle" placeholder=" " required>
-          <label>Título do Projeto</label>
-        </div>
-        <div class="input-group">
-          <input type="text" id="postLocation" placeholder=" " required>
-          <label>Localização (ex: São Paulo, SP)</label>
-        </div>
-        <div class="input-group">
-          <input type="url" id="postImage" placeholder=" " required>
-          <label>URL da Imagem</label>
-        </div>
-        <div class="input-group">
-          <textarea id="postDescription" placeholder=" " required></textarea>
-          <label>Descrição do Projeto</label>
-        </div>
-        <div class="input-group">
-          <input type="text" id="postTags" placeholder=" " required>
-          <label>Tags (separadas por vírgula)</label>
-        </div>
-        <button type="submit" class="btn">Publicar Projeto</button>
-      </form>
-    </div>
+<!-- Modal de Edição -->
+<div id="editPostModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeEditPostModal()">&times;</span>
+    <h2>Editar Projeto</h2>
+    <form id="editPostForm">
+      <div class="input-group">
+        <input type="text" id="editPostTitle" placeholder=" " required>
+        <label>Título do Projeto</label>
+      </div>
+      <div class="input-group">
+        <input type="text" id="editPostLocation" placeholder=" " required>
+        <label>Localização (ex: São Paulo, SP)</label>
+      </div>
+      <div class="input-group">
+        <input type="url" id="editPostImage" placeholder=" " required>
+        <label>URL da Imagem</label>
+      </div>
+      <div class="input-group">
+        <textarea id="editPostDescription" placeholder=" " required></textarea>
+        <label>Descrição do Projeto</label>
+      </div>
+      <div class="input-group">
+        <input type="text" id="editPostTags" placeholder=" " required>
+        <label>Tags (separadas por vírgula)</label>
+      </div>
+      <input type="hidden" id="editProjectId">
+      <button type="submit" class="btn">Salvar Alterações</button>
+    </form>
   </div>
+</div>
 
   <!-- Modal de Login/Cadastro -->
   <div id="authModal" class="auth-modal">

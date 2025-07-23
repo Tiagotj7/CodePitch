@@ -16,6 +16,7 @@ const db = firebase.firestore();
 // ================= VARIÁVEIS GLOBAIS ================= //
 let projects = [];
 let currentProjectId = null;
+let currentSlide = 0;
 
 // ================= INICIALIZAÇÃO DA PÁGINA ================= //
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupAuthListeners();
   setupCreatePost();
   setupEditPost();
+  setupCommentSystem();
 });
 
 // ================= SISTEMA DE PROJETOS ================= //
@@ -42,8 +44,8 @@ async function initProjects() {
       projects.push({
         id: doc.id,
         ...projectData,
-        // Garante que o nome do autor está presente
-        author: projectData.author || "Autor desconhecido"
+        author: projectData.author || "Autor desconhecido",
+        tags: projectData.tags || []
       });
     });
     
@@ -51,7 +53,8 @@ async function initProjects() {
     
   } catch (error) {
     console.error("Erro ao carregar projetos:", error);
-    grid.innerHTML = '<p class="error">Erro ao carregar projetos. Tente recarregar a página.</p>';
+    projects = getFallbackProjects();
+    renderProjects();
   }
 }
 
@@ -59,11 +62,12 @@ function renderProjects() {
   const grid = document.getElementById('projectsGrid');
   grid.innerHTML = '';
   
+  const currentUser = auth.currentUser;
+
   projects.forEach(project => {
     const card = document.createElement('div');
     card.className = 'project-card';
     
-    const currentUser = auth.currentUser;
     const isAuthor = currentUser && currentUser.uid === project.authorId;
     const createdAt = project.createdAt?.toDate ? project.createdAt.toDate() : new Date(project.createdAt);
     
@@ -79,8 +83,8 @@ function renderProjects() {
           <div class="project-actions-menu">
             <button class="menu-btn" onclick="toggleProjectMenu(this)">⋮</button>
             <div class="menu-options">
-              <button onclick="deleteProject('${project.id}')">Excluir</button>
-              <button onclick="openEditModal('${project.id}')">Editar</button>
+              <button class="delete-btn" onclick="event.stopPropagation(); deleteProject('${project.id}')">Excluir</button>
+              <button class="edit-btn" onclick="event.stopPropagation(); openEditModal('${project.id}')">Editar</button>
             </div>
           </div>
         ` : ''}
@@ -106,21 +110,76 @@ function renderProjects() {
 }
 
 function getInitials(name) {
-  return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  if (!name) return "?";
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+}
+
+function getFallbackProjects() {
+  return [
+    {
+      id: "1",
+      title: "E-commerce Platform",
+      author: "Maria Silva",
+      location: "São Paulo, SP",
+      image: "https://imgs.search.brave.com/bAM5fcnemhP2h-qykELl60oruXYNqSRqlwQZpkg-lRc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zZWph/ZWZpLmNvbS5ici9w/b3J0YWwvd3AtY29u/dGVudC91cGxvYWRz/LzIwMjQvMTAvcGFn/YW1lbnRvLW9ubGlu/ZS5wbmc",
+      description: "Plataforma de e‑commerce com carrinho, pagamento integrado e painel administrativo.",
+      tags: ["React", "Node.js", "MongoDB"],
+      createdAt: new Date('2023-01-15').toISOString()
+    },
+    {
+      id: "2",
+      title: "Sales Dashboard",
+      author: "João Santos",
+      location: "Rio de Janeiro, RJ",
+      image: "https://imgs.search.brave.com/ZYaopMwrlahUA2MEowLQU9wQz9YvvYIT8pzgRgjQcA4/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9naXRo/dWIuY29tL3Bsb3Rs/eS9kYXNoLXNhbXBs/ZS1hcHBzL3Jhdy9t/YWluL2FwcHMvZGFz/aC1tYW51ZmFjdHVy/ZS1zcGMtZGFzaGJv/YXJkL2ltZy9zY3Jl/ZW5jYXB0dXJlMS5w/bmc",
+      description: "Dashboard interativo para análise de vendas em tempo real usando Python e Plotly.",
+      tags: ["Python", "Pandas", "Plotly"],
+      createdAt: new Date('2023-02-20').toISOString()
+    },
+    {
+      id: "3",
+      title: "Task Manager App",
+      author: "Ana Costa",
+      location: "Belo Horizonte, MG",
+      image: "https://images.unsplash.com/photo-1558655146-d09347e92766?fit=crop&w=800&q=80",
+      description: "App mobile de gerenciamento de tarefas com autenticação e sincronização via Firebase.",
+      tags: ["React Native", "Firebase", "UX/UI"],
+      createdAt: new Date('2023-03-10').toISOString()
+    }
+  ];
 }
 
 // ================= FUNÇÕES DE GERENCIAMENTO DE PROJETOS ================= //
 function toggleProjectMenu(button) {
-  const menuOptions = button.nextElementSibling;
-  menuOptions.style.display = menuOptions.style.display === 'block' ? 'none' : 'block';
+  const menuContainer = button.closest('.project-actions-menu');
+  menuContainer.classList.toggle('active');
+  
+  // Fecha outros menus abertos
+  document.querySelectorAll('.project-actions-menu').forEach(menu => {
+    if (menu !== menuContainer) {
+      menu.classList.remove('active');
+    }
+  });
 }
 
 async function deleteProject(projectId) {
+  if (!auth.currentUser) {
+    alert('Você precisa estar logado para excluir projetos!');
+    return;
+  }
+  
   if (!confirm('Tem certeza que deseja excluir este projeto permanentemente?')) {
     return;
   }
 
   try {
+    // Verifica se o usuário é o autor
+    const projectDoc = await db.collection('projects').doc(projectId).get();
+    if (projectDoc.exists && projectDoc.data().authorId !== auth.currentUser.uid) {
+      alert('Você não tem permissão para excluir este projeto!');
+      return;
+    }
+    
     await db.collection('projects').doc(projectId).delete();
     
     // Remove do array local
@@ -134,26 +193,129 @@ async function deleteProject(projectId) {
   }
 }
 
-function openEditModal(projectId) {
-  const project = projects.find(p => p.id === projectId);
-  if (!project) return;
+// ================= EDIÇÃO DE POSTS ================= //
+function setupEditPost() {
+  const editForm = document.getElementById('editPostForm');
+  
+  editForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const user = auth.currentUser;
+    if (!user) {
+      alert('Você precisa estar logado para editar projetos!');
+      return;
+    }
+    
+    const projectId = document.getElementById('editProjectId').value;
+    const title = document.getElementById('editPostTitle').value.trim();
+    const location = document.getElementById('editPostLocation').value.trim();
+    const image = document.getElementById('editPostImage').value.trim();
+    const description = document.getElementById('editPostDescription').value.trim();
+    const tags = document.getElementById('editPostTags').value.split(',').map(t => t.trim()).filter(t => t);
+    
+    // Validação básica
+    if (!projectId || !title || !location || !image || !description || tags.length === 0) {
+      alert('Preencha todos os campos corretamente!');
+      return;
+    }
+    
+    try {
+      // Verifica se o usuário é o autor
+      const projectDoc = await db.collection('projects').doc(projectId).get();
+      if (projectDoc.exists && projectDoc.data().authorId !== user.uid) {
+        alert('Você não tem permissão para editar este projeto!');
+        return;
+      }
+      
+      // Atualiza no Firestore
+      await db.collection('projects').doc(projectId).update({
+        title,
+        location,
+        image,
+        description,
+        tags,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      
+      // Atualiza localmente
+      const projectIndex = projects.findIndex(p => p.id === projectId);
+      if (projectIndex !== -1) {
+        projects[projectIndex] = {
+          ...projects[projectIndex],
+          title,
+          location,
+          image,
+          description,
+          tags
+        };
+      }
+      
+      renderProjects();
+      closeEditPostModal();
+      alert('Projeto atualizado com sucesso!');
+      
+    } catch (error) {
+      console.error("Erro ao atualizar projeto:", error);
+      alert('Erro ao atualizar projeto. Tente novamente.');
+    }
+  });
+}
 
+function openEditModal(projectId) {
+  const user = auth.currentUser;
+  if (!user) {
+    alert('Você precisa estar logado para editar projetos!');
+    openAuthModal();
+    return;
+  }
+  
+  const project = projects.find(p => p.id === projectId);
+  if (!project) {
+    alert('Projeto não encontrado!');
+    return;
+  }
+  
+  // Verifica se o usuário é o autor
+  if (project.authorId !== user.uid) {
+    alert('Você não tem permissão para editar este projeto!');
+    return;
+  }
+  
+  // Preenche o formulário
   document.getElementById('editPostTitle').value = project.title || '';
-  document.getElementById('editPostLocation').value = project.location;
-  document.getElementById('editPostImage').value = project.image;
-  document.getElementById('editPostDescription').value = project.description;
-  document.getElementById('editPostTags').value = project.tags.join(', ');
+  document.getElementById('editPostLocation').value = project.location || '';
+  document.getElementById('editPostImage').value = project.image || '';
+  document.getElementById('editPostDescription').value = project.description || '';
+  document.getElementById('editPostTags').value = project.tags?.join(', ') || '';
   document.getElementById('editProjectId').value = projectId;
   
+  // Abre o modal
   document.getElementById('editPostModal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEditPostModal() {
+  document.getElementById('editPostModal').style.display = 'none';
+  document.body.style.overflow = 'auto';
 }
 
 // ================= SISTEMA DE COMENTÁRIOS ================= //
+function setupCommentSystem() {
+  // Configuração básica do sistema de comentários
+}
+
 async function openComments(projectId, author) {
+  if (!auth.currentUser) {
+    alert('Você precisa estar logado para ver comentários!');
+    openAuthModal();
+    return;
+  }
+  
   currentProjectId = projectId;
   const modal = document.getElementById('commentsModal');
   document.getElementById('modalTitle').textContent = `Comentários - ${author}`;
   modal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
   await loadComments(projectId);
 }
 
@@ -179,17 +341,18 @@ async function loadComments(projectId) {
       const comment = doc.data();
       const date = comment.timestamp?.toDate().toLocaleString('pt-BR') || 'Agora';
       
-      commentsList.innerHTML += `
-        <div class="comment">
-          <div class="comment-header">
-            <span class="comment-author">${comment.authorName}</span>
-            ${currentUser?.uid === comment.authorId ? 
-              `<button class="delete-comment-btn" onclick="deleteComment('${doc.id}')">🗑️</button>` : ''}
-          </div>
-          <p class="comment-text">${comment.text}</p>
-          <small class="comment-date">${date}</small>
+      const commentElement = document.createElement('div');
+      commentElement.className = 'comment';
+      commentElement.innerHTML = `
+        <div class="comment-header">
+          <span class="comment-author">${comment.authorName}</span>
+          ${currentUser?.uid === comment.authorId ? 
+            `<button class="delete-comment-btn" onclick="deleteComment('${doc.id}')">🗑️</button>` : ''}
         </div>
+        <p class="comment-text">${comment.text}</p>
+        <small class="comment-date">${date}</small>
       `;
+      commentsList.appendChild(commentElement);
     });
   } catch (error) {
     console.error("Erro ao carregar comentários:", error);
@@ -221,7 +384,7 @@ async function addComment() {
     });
 
     document.getElementById('commentText').value = '';
-    loadComments(currentProjectId);
+    await loadComments(currentProjectId);
   } catch (error) {
     console.error("Erro ao adicionar comentário:", error);
     alert('Erro ao enviar comentário. Tente novamente.');
@@ -242,15 +405,17 @@ async function deleteComment(commentId) {
 
 function closeModal() {
   document.getElementById('commentsModal').style.display = 'none';
+  document.body.style.overflow = 'auto';
 }
 
 // ================= AUTENTICAÇÃO ================= //
 function setupAuthListeners() {
   auth.onAuthStateChanged(user => {
-    updateLoginButton(user);
+    updateUI(user);
     renderProjects();
   });
 
+  // Login
   document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = e.target.email.value;
@@ -264,6 +429,7 @@ function setupAuthListeners() {
     }
   });
 
+  // Cadastro
   document.getElementById('register-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = e.target.name.value;
@@ -281,7 +447,7 @@ function setupAuthListeners() {
   });
 }
 
-function updateLoginButton(user) {
+function updateUI(user) {
   const loginBtn = document.getElementById('loginBtn');
   const userDropdown = document.getElementById('userDropdown');
   const createPostBtn = document.getElementById('createPostBtn');
@@ -289,10 +455,10 @@ function updateLoginButton(user) {
   if (user) {
     loginBtn.style.display = 'none';
     userDropdown.style.display = 'block';
-    createPostBtn.style.display = 'block';
+    createPostBtn.style.display = 'flex';
     document.getElementById('userNameDisplay').textContent = user.displayName || user.email.split('@')[0];
   } else {
-    loginBtn.style.display = 'block';
+    loginBtn.style.display = 'flex';
     userDropdown.style.display = 'none';
     createPostBtn.style.display = 'none';
   }
@@ -303,6 +469,7 @@ function logout() {
     closeModal();
     closeAuthModal();
     closeCreatePostModal();
+    closeEditPostModal();
     document.getElementById('dropdownContent').style.display = 'none';
   }).catch(error => {
     console.error("Erro ao fazer logout:", error);
@@ -349,7 +516,7 @@ function setupCreatePost() {
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       
-      // Adiciona ao array local com o ID do Firestore
+      // Adiciona ao array local
       projects.unshift({
         id: docRef.id,
         title: title,
@@ -373,81 +540,6 @@ function setupCreatePost() {
   });
 }
 
-// ================= EDIÇÃO DE POSTS ================= //
-function setupEditPost() {
-  const editForm = document.getElementById('editPostForm');
-  editForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const projectId = document.getElementById('editProjectId').value;
-    const title = document.getElementById('editPostTitle').value.trim();
-    const location = document.getElementById('editPostLocation').value.trim();
-    const image = document.getElementById('editPostImage').value.trim();
-    const description = document.getElementById('editPostDescription').value.trim();
-    const tags = document.getElementById('editPostTags').value.split(',').map(t => t.trim()).filter(t => t);
-    
-    if (!projectId || !title || !location || !image || !description || tags.length === 0) {
-      alert('Preencha todos os campos corretamente!');
-      return;
-    }
-    
-    try {
-      await db.collection('projects').doc(projectId).update({
-        title: title,
-        location: location,
-        image: image,
-        description: description,
-        tags: tags,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      
-      // Atualiza o array local
-      const projectIndex = projects.findIndex(p => p.id === projectId);
-      if (projectIndex !== -1) {
-        projects[projectIndex] = {
-          ...projects[projectIndex],
-          title: title,
-          location: location,
-          image: image,
-          description: description,
-          tags: tags
-        };
-      }
-      
-      renderProjects();
-      closeEditPostModal();
-      
-    } catch (error) {
-      console.error('Erro ao atualizar projeto:', error);
-      alert('Erro ao atualizar projeto. Tente novamente.');
-    }
-  });
-}
-
-function closeEditPostModal() {
-  document.getElementById('editPostModal').style.display = 'none';
-}
-
-// ================= MODAIS ================= //
-function openAuthModal() {
-  document.getElementById('authModal').style.display = 'block';
-  document.body.style.overflow = 'hidden';
-}
-
-function closeAuthModal() {
-  document.getElementById('authModal').style.display = 'none';
-  document.body.style.overflow = 'auto';
-}
-
-function showRegister() {
-  document.getElementById('loginSection').classList.add('register-active');
-  document.getElementById('registerSection').classList.add('active');
-}
-
-function showLogin() {
-  document.getElementById('loginSection').classList.remove('register-active');
-  document.getElementById('registerSection').classList.remove('active');
-}
-
 function openCreatePostModal() {
   if (!auth.currentUser) {
     alert('Você precisa estar logado para criar um post!');
@@ -468,53 +560,84 @@ function initCarousel() {
   const track = document.getElementById('carouselTrack');
   const slides = Array.from(track.children);
   const dots = Array.from(document.querySelectorAll('.nav-dot'));
-  let currentIndex = 0;
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  
+  if (!track || slides.length === 0) return;
 
   function updateCarousel() {
-    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    track.style.transform = `translateX(-${currentSlide * 100}%)`;
     dots.forEach((dot, index) => {
-      dot.classList.toggle('active', index === currentIndex);
+      dot.classList.toggle('active', index === currentSlide);
     });
   }
 
-  document.getElementById('nextBtn').addEventListener('click', () => {
-    currentIndex = (currentIndex + 1) % slides.length;
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
     updateCarousel();
-  });
+  }
 
-  document.getElementById('prevBtn').addEventListener('click', () => {
-    currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+  function prevSlide() {
+    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
     updateCarousel();
-  });
+  }
+
+  nextBtn.addEventListener('click', nextSlide);
+  prevBtn.addEventListener('click', prevSlide);
 
   dots.forEach((dot, index) => {
     dot.addEventListener('click', () => {
-      currentIndex = index;
+      currentSlide = index;
       updateCarousel();
     });
   });
 
-  setInterval(() => {
-    currentIndex = (currentIndex + 1) % slides.length;
-    updateCarousel();
-  }, 5000);
+  // Auto-avanço
+  setInterval(nextSlide, 5000);
+}
+
+// ================= MODAIS DE AUTENTICAÇÃO ================= //
+function openAuthModal() {
+  document.getElementById('authModal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAuthModal() {
+  document.getElementById('authModal').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+function showRegister() {
+  document.getElementById('loginSection').classList.add('register-active');
+  document.getElementById('registerSection').classList.add('active');
+}
+
+function showLogin() {
+  document.getElementById('loginSection').classList.remove('register-active');
+  document.getElementById('registerSection').classList.remove('active');
 }
 
 // ================= EVENTOS GLOBAIS ================= //
 window.addEventListener('click', (e) => {
-  if (e.target === document.getElementById('commentsModal')) closeModal();
-  if (e.target === document.getElementById('authModal')) closeAuthModal();
-  if (e.target === document.getElementById('createPostModal')) closeCreatePostModal();
-  if (e.target === document.getElementById('editPostModal')) closeEditPostModal();
+  // Fecha modais ao clicar fora
+  if (e.target.classList.contains('modal')) {
+    closeModal();
+    closeAuthModal();
+    closeCreatePostModal();
+    closeEditPostModal();
+  }
+  
+  // Fecha menus dropdown ao clicar fora
   if (!e.target.closest('.user-dropdown')) {
     document.getElementById('dropdownContent').style.display = 'none';
   }
   
-  document.querySelectorAll('.menu-options').forEach(menu => {
-    if (!e.target.closest('.project-actions-menu')) {
-      menu.style.display = 'none';
-    }
-  });
+  // Fecha menus de projeto ao clicar fora
+  if (!e.target.closest('.project-actions-menu')) {
+    document.querySelectorAll('.project-actions-menu').forEach(menu => {
+      menu.classList.remove('active');
+    });
+  }
 });
 
 document.addEventListener('keydown', (e) => {
@@ -526,7 +649,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// ================= FUNÇÕES GLOBAIS ================= //
+// ================= EXPORT FUNCTIONS ================= //
 window.openComments = openComments;
 window.addComment = addComment;
 window.deleteComment = deleteComment;
