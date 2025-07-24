@@ -35,25 +35,25 @@
       <nav class="nav-links">
         <a href="index.html">Home</a>
         <a href="project.html">Explorar Projetos</a>
-        <div id="userMenuContainer">
-          <button id="createPostBtn" class="cta-button" onclick="openCreatePostModal()">
-            <span class="cta-text">Criar Post</span>
-            <span class="cta-icon">✏️</span>
+      </nav>
+      <div class="user-actions">
+        <button id="createPostBtn" class="cta-button" onclick="openCreatePostModal()">
+          <span class="cta-text">Criar Post</span>
+          <span class="cta-icon">✏️</span>
+        </button>
+        <button id="loginBtn" class="cta-button" onclick="openAuthModal()">
+          <span class="cta-text">Entrar</span>
+          <span class="cta-icon">🚀</span>
+        </button>
+        <div id="userDropdown" class="user-dropdown" style="display: none;">
+          <button class="user-button" onclick="toggleUserMenu()">
+            👤 <span id="userNameDisplay">Usuário</span>
           </button>
-          <button id="loginBtn" class="cta-button" onclick="openAuthModal()">
-            <span class="cta-text">Entrar</span>
-            <span class="cta-icon">🚀</span>
-          </button>
-          <div id="userDropdown" class="user-dropdown" style="display: none;">
-            <button class="user-button" onclick="toggleUserMenu()">
-              👤 <span id="userNameDisplay">Usuário</span>
-            </button>
-            <div id="dropdownContent" class="dropdown-content">
-              <button onclick="logout()">Sair</button>
-            </div>
+          <div id="dropdownContent" class="dropdown-content">
+            <button onclick="logout()">Sair</button>
           </div>
         </div>
-      </nav>
+      </div>
     </div>
   </header>
 
@@ -109,37 +109,67 @@
   </div>
 
   <!-- Modal de Criar Post -->
-<!-- Modal de Edição -->
-<div id="editPostModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeEditPostModal()">&times;</span>
-    <h2>Editar Projeto</h2>
-    <form id="editPostForm">
-      <div class="input-group">
-        <input type="text" id="editPostTitle" placeholder=" " required>
-        <label>Título do Projeto</label>
-      </div>
-      <div class="input-group">
-        <input type="text" id="editPostLocation" placeholder=" " required>
-        <label>Localização (ex: São Paulo, SP)</label>
-      </div>
-      <div class="input-group">
-        <input type="url" id="editPostImage" placeholder=" " required>
-        <label>URL da Imagem</label>
-      </div>
-      <div class="input-group">
-        <textarea id="editPostDescription" placeholder=" " required></textarea>
-        <label>Descrição do Projeto</label>
-      </div>
-      <div class="input-group">
-        <input type="text" id="editPostTags" placeholder=" " required>
-        <label>Tags (separadas por vírgula)</label>
-      </div>
-      <input type="hidden" id="editProjectId">
-      <button type="submit" class="btn">Salvar Alterações</button>
-    </form>
+  <div id="createPostModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeCreatePostModal()">&times;</span>
+      <h2>Criar Novo Projeto</h2>
+      <form id="postForm">
+        <div class="input-group">
+          <input type="text" id="postTitle" placeholder=" " required>
+          <label>Título do Projeto</label>
+        </div>
+        <div class="input-group">
+          <input type="text" id="postLocation" placeholder=" " required>
+          <label>Localização (ex: São Paulo, SP)</label>
+        </div>
+        <div class="input-group">
+          <input type="url" id="postImage" placeholder=" " required>
+          <label>URL da Imagem</label>
+        </div>
+        <div class="input-group">
+          <textarea id="postDescription" placeholder=" " required></textarea>
+          <label>Descrição do Projeto</label>
+        </div>
+        <div class="input-group">
+          <input type="text" id="postTags" placeholder=" " required>
+          <label>Tags (separadas por vírgula)</label>
+        </div>
+        <button type="submit" class="btn">Publicar Projeto</button>
+      </form>
+    </div>
   </div>
-</div>
+
+  <!-- Modal de Edição -->
+  <div id="editPostModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeEditPostModal()">&times;</span>
+      <h2>Editar Projeto</h2>
+      <form id="editPostForm">
+        <div class="input-group">
+          <input type="text" id="editPostTitle" placeholder=" " required>
+          <label>Título do Projeto</label>
+        </div>
+        <div class="input-group">
+          <input type="text" id="editPostLocation" placeholder=" " required>
+          <label>Localização (ex: São Paulo, SP)</label>
+        </div>
+        <div class="input-group">
+          <input type="url" id="editPostImage" placeholder=" " required>
+          <label>URL da Imagem</label>
+        </div>
+        <div class="input-group">
+          <textarea id="editPostDescription" placeholder=" " required></textarea>
+          <label>Descrição do Projeto</label>
+        </div>
+        <div class="input-group">
+          <input type="text" id="editPostTags" placeholder=" " required>
+          <label>Tags (separadas por vírgula)</label>
+        </div>
+        <input type="hidden" id="editProjectId">
+        <button type="submit" class="btn">Salvar Alterações</button>
+      </form>
+    </div>
+  </div>
 
   <!-- Modal de Login/Cadastro -->
   <div id="authModal" class="auth-modal">

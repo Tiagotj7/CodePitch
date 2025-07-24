@@ -24,79 +24,6 @@
 
     <!-- Boxicons -->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-</head>
-
-<body>
-    <header id="navbar">
-        <div class="navbar">
-            <h1>CodePitch</h1>
-            <nav class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="project.html">Explorar Projetos</a>
-                <div id="userMenuContainer">
-                    <button id="loginBtn" class="cta-button" onclick="openAuthModal()">
-                        <span class="cta-text">Entrar</span>
-                        <span class="cta-icon">🚀</span>
-                    </button>
-                    <div id="userDropdown" class="user-dropdown" style="display: none;">
-                        <button class="user-button" onclick="toggleUserMenu()">
-                            👤 <span id="userNameDisplay">Usuário</span>
-                        </button>
-                        <div id="dropdownContent" class="dropdown-content">
-                            <button onclick="logout()">Sair</button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-        </div>
-    </header>
-
-    <main class="container">
-        <section class="projects-section">
-            <h2>Projetos em Destaque</h2>
-            <div class="projects-grid" id="projectsGrid">
-                <!-- Projetos serão renderizados aqui via JavaScript -->
-            </div>
-        </section>
-    </main>
-
-    <!-- Modal de Comentários -->
-    <div id="commentsModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h3 id="modalTitle">Comentários</h3>
-            <div id="commentsList" class="comments-list"></div>
-            <div class="comment-form">
-                <textarea id="commentText" placeholder="Adicione um comentário..."></textarea>
-                <button class="btn-primary" onclick="addComment()">Enviar Comentário</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Edição -->
-    <div id="editPostModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h3>Editar Projeto</h3>
-            <div class="form-group">
-                <input type="text" id="editPostTitle" placeholder="Título" required>
-            </div>
-            <div class="form-group">
-                <input type="text" id="editPostLocation" placeholder="Localização" required>
-            </div>
-            <div class="form-group">
-                <input type="url" id="editPostImage" placeholder="URL da Imagem" required>
-            </div>
-            <div class="form-group">
-                <textarea id="editPostDescription" placeholder="Descrição" required></textarea>
-            </div>
-            <div class="form-group">
-                <input type="text" id="editPostTags" placeholder="Tags (separadas por vírgula)">
-            </div>
-            <input type="hidden" id="editProjectId">
-            <button class="btn-primary" onclick="saveEditedPost()">Salvar Alterações</button>
-        </div>
-    </div>
 
     <style>
         /* ================= VARIÁVEIS CSS ================= */
@@ -126,7 +53,7 @@
             line-height: 1.6;
         }
 
-        /* Header */
+        /* ================= HEADER ================= */
         header {
             position: fixed;
             width: 100%;
@@ -149,17 +76,21 @@
             align-items: center;
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
         }
 
         .navbar h1 {
             color: var(--primary-color);
             font-size: 1.8rem;
+            white-space: nowrap;
         }
 
         .nav-links {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             gap: 2rem;
-            align-items: center;
         }
 
         .nav-links a {
@@ -167,10 +98,35 @@
             color: var(--text-primary);
             font-weight: 500;
             transition: color 0.2s;
+            white-space: nowrap;
+            padding: 0.5rem 0;
+            position: relative;
         }
 
         .nav-links a:hover {
             color: var(--primary-color);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-left: auto;
         }
 
         /* CTA Button */
@@ -192,6 +148,53 @@
             background-color: #4595ff;
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(88, 166, 255, 0.2);
+        }
+
+        /* Dropdown do usuário */
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-button {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-button:hover {
+            background-color: #2ea043;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: var(--background-medium);
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            z-index: 1;
+            border: 1px solid var(--border-color);
+        }
+
+        .dropdown-content button {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .dropdown-content button:hover {
+            background-color: var(--background-light);
         }
 
         /* Main Content */
@@ -406,53 +409,6 @@
             }
         }
 
-        /* Dropdown do usuário */
-        .user-dropdown {
-            position: relative;
-        }
-
-        .user-button {
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .user-button:hover {
-            background-color: #2ea043;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background-color: var(--background-medium);
-            min-width: 160px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            border-radius: 6px;
-            z-index: 1;
-            border: 1px solid var(--border-color);
-        }
-
-        .dropdown-content button {
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            padding: 0.75rem 1rem;
-            width: 100%;
-            text-align: left;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .dropdown-content button:hover {
-            background-color: var(--background-light);
-        }
-
         /* Modal Styles */
         .modal {
             display: none;
@@ -590,6 +546,79 @@
             }
         }
     </style>
+</head>
+
+<body>
+    <header id="navbar">
+        <div class="navbar">
+            <h1>CodePitch</h1>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="project.html">Explorar Projetos</a>
+            </nav>
+            <div class="user-actions">
+                <button id="loginBtn" class="cta-button" onclick="openAuthModal()">
+                    <span class="cta-text">Entrar</span>
+                    <span class="cta-icon">🚀</span>
+                </button>
+                <div id="userDropdown" class="user-dropdown" style="display: none;">
+                    <button class="user-button" onclick="toggleUserMenu()">
+                        👤 <span id="userNameDisplay">Usuário</span>
+                    </button>
+                    <div id="dropdownContent" class="dropdown-content">
+                        <button onclick="logout()">Sair</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="projects-section">
+            <h2>Projetos em Destaque</h2>
+            <div class="projects-grid" id="projectsGrid">
+                <!-- Projetos serão renderizados aqui via JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Comentários -->
+    <div id="commentsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle">Comentários</h3>
+            <div id="commentsList" class="comments-list"></div>
+            <div class="comment-form">
+                <textarea id="commentText" placeholder="Adicione um comentário..."></textarea>
+                <button class="btn-primary" onclick="addComment()">Enviar Comentário</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição -->
+    <div id="editPostModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Editar Projeto</h3>
+            <div class="form-group">
+                <input type="text" id="editPostTitle" placeholder="Título" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="editPostLocation" placeholder="Localização" required>
+            </div>
+            <div class="form-group">
+                <input type="url" id="editPostImage" placeholder="URL da Imagem" required>
+            </div>
+            <div class="form-group">
+                <textarea id="editPostDescription" placeholder="Descrição" required></textarea>
+            </div>
+            <div class="form-group">
+                <input type="text" id="editPostTags" placeholder="Tags (separadas por vírgula)">
+            </div>
+            <input type="hidden" id="editProjectId">
+            <button class="btn-primary" onclick="saveEditedPost()">Salvar Alterações</button>
+        </div>
+    </div>
 
     <script>
         // ================= CONFIGURAÇÃO DO FIREBASE ================= //
